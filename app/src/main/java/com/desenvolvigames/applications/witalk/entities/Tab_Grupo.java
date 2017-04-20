@@ -1,8 +1,9 @@
 package com.desenvolvigames.applications.witalk.entities;
 
 /**
- * Created by Joao on 18/04/2017.
+ * Created by Joao on 19/04/2017.
  */
 
-public class IpClass {
+public class Tab_Grupo
+{
 }

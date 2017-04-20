@@ -8,9 +8,9 @@ import java.util.Date;
  * Created by Joao on 16/04/2017.
  */
 
-public class UsuarioClass
+public class Tab_Usuario
 {
-    public UsuarioClass()
+    public Tab_Usuario()
     {
         pk_int_IdUsuario = 1;
         fk_int_IdIp = 1;
