@@ -3,9 +3,13 @@ package com.desenvolvigames.applications.witalk.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.desenvolvigames.applications.witalk.R;
+import com.desenvolvigames.applications.witalk.control.JsonObjetcManagement;
+import com.desenvolvigames.applications.witalk.entities.Tab_Ip;
 import com.desenvolvigames.applications.witalk.utilities.connection.GetAsyncTask;
+import com.desenvolvigames.applications.witalk.utilities.connection.PostAsyncTask;
 import com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -26,18 +30,10 @@ public class MainActivity extends BaseActivity
     private CallbackManager callbackManager;
 
     @Override
-    protected void onStop()
-    {
-        super.onStop();
-    }
+    protected void onStop(){super.onStop();}
 
     @Override
-    protected void onDestroy()
-    {
-//        if(AccessToken.getCurrentAccessToken()!=null)
-//            LoginManager.getInstance().logOut();
-        super.onDestroy();
-    }
+    protected void onDestroy(){super.onDestroy();}
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -46,23 +42,7 @@ public class MainActivity extends BaseActivity
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_main);
         BuscarIp();
-        loginButton = (LoginButton)findViewById(R.id.fb_login_bn);
-        callbackManager = CallbackManager.Factory.create();
-        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>()
-        {
-            @Override
-            public void onSuccess(LoginResult loginResult)
-            {
-            }
-            @Override
-            public void onCancel()
-            {
-            }
-            @Override
-            public void onError(FacebookException error)
-            {
-            }
-        });
+        IniciarControlesFacebook();
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
@@ -76,22 +56,64 @@ public class MainActivity extends BaseActivity
         try
         {
             JSONObject jsonObject = new JSONObject(json);
-            ConstantsClass.IPEXTERNO = (String)jsonObject.get("ip");
+            ConstantsClass.IpExterno = (String)jsonObject.get("ip");
+            PopularIp();
+            PostIp();
             Log.i("RespostaGet", json);
         }catch(Exception ex)
         {
             Log.i("RespostaGet", ex.getMessage());
         }
     }
-
-    private void BuscarIp()
+    @Override
+    public String GetJsonParameters()
     {
-        ConstantsClass.IPEXTERNO = "";
-        GetAsyncTask task = new GetAsyncTask(MainActivity.this);
-        task.execute(ConstantsClass.GETIPURL);
+        return jsonParameter.toString();
     }
 
-    private void teste()
+    private void IniciarControlesFacebook()
+    {
+        loginButton = (LoginButton)findViewById(R.id.fb_login_bn);
+        callbackManager = CallbackManager.Factory.create();
+        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>()
+        {
+            @Override
+            public void onSuccess(LoginResult loginResult)
+            {
+                Toast.makeText(MainActivity.this, "", Toast.LENGTH_LONG).show();
+            }
+            @Override
+            public void onCancel()
+            {
+                if(AccessToken.getCurrentAccessToken()!=null)
+                    LoginManager.getInstance().logOut();
+            }
+            @Override
+            public void onError(FacebookException error)
+            {
+                if(AccessToken.getCurrentAccessToken()!=null)
+                    LoginManager.getInstance().logOut();
+            }
+        });
+    }
+    private void BuscarIp()
+    {
+        ConstantsClass.IpExterno = "";
+        GetAsyncTask task = new GetAsyncTask(MainActivity.this);
+        task.execute(ConstantsClass.GetIpUrl);
+    }
+    private void PostIp()
+    {
+        PostAsyncTask task = new PostAsyncTask(MainActivity.this);
+        task.execute(ConstantsClass.PostIpObjectUrl);
+    }
+    private void PopularIp()
+    {
+        Tab_Ip tabIp = new Tab_Ip();
+        tabIp.setIp(ConstantsClass.IpExterno);
+        jsonParameter = JsonObjetcManagement.ParseObjectJson(tabIp);
+    }
+    private void teste(Bundle parameters)
     {
         GraphRequest request = GraphRequest.newMeRequest(
                 AccessToken.getCurrentAccessToken(),
@@ -102,8 +124,8 @@ public class MainActivity extends BaseActivity
                     {
                     }
                 });
-        Bundle parameters = new Bundle();
-        parameters.putString("fields", "id,name,link");
+//        Bundle parameters = new Bundle();
+//        parameters.putString("fields", "id,name,link");
         request.setParameters(parameters);
         request.executeAsync();
     }

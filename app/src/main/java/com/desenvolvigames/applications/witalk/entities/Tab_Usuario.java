@@ -8,7 +8,7 @@ import java.util.Date;
  * Created by Joao on 16/04/2017.
  */
 
-public class Tab_Usuario
+public class Tab_Usuario extends EntityBase
 {
     public Tab_Usuario()
     {

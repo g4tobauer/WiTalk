@@ -5,8 +5,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import com.desenvolvigames.applications.witalk.interfaces.IJsonNotifiable;
 
+import org.json.JSONObject;
+
 public class BaseActivity extends AppCompatActivity implements IJsonNotifiable
 {
+    protected JSONObject jsonParameter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -18,4 +22,7 @@ public class BaseActivity extends AppCompatActivity implements IJsonNotifiable
 
     @Override
     public void ExecuteNotify(String json){}
+
+    @Override
+    public String GetJsonParameters(){return null;}
 }
