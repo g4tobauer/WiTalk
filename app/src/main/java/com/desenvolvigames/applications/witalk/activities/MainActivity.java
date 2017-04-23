@@ -3,6 +3,7 @@ package com.desenvolvigames.applications.witalk.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.desenvolvigames.applications.witalk.R;
@@ -26,8 +27,9 @@ import org.json.JSONObject;
 
 public class MainActivity extends BaseActivity
 {
-    private LoginButton loginButton;
-    private CallbackManager callbackManager;
+//    private LoginButton loginButton;
+//    private CallbackManager callbackManager;
+    private TextView txtView;
 
     @Override
     protected void onStop(){super.onStop();}
@@ -41,61 +43,78 @@ public class MainActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_main);
+        txtView = (TextView)findViewById(R.id.textView);
         BuscarIp();
-        IniciarControlesFacebook();
+//        IniciarControlesFacebook();
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-//        super.onActivityResult(requestCode, resultCode, data);
-        callbackManager.onActivityResult(requestCode,resultCode,data);
+        super.onActivityResult(requestCode, resultCode, data);
+//        callbackManager.onActivityResult(requestCode,resultCode,data);
     }
     @Override
-    public void ExecuteNotify(String json)
+    public void ExecuteNotify(String tag, String json)
     {
-        try
+        switch (tag)
         {
-            JSONObject jsonObject = new JSONObject(json);
-            ConstantsClass.IpExterno = (String)jsonObject.get("ip");
-            PopularIp();
-            PostIp();
-            Log.i("RespostaGet", json);
-        }catch(Exception ex)
-        {
-            Log.i("RespostaGet", ex.getMessage());
+            case "GETIP":
+                try
+                {
+                    JSONObject jsonObject = new JSONObject(json);
+                    ConstantsClass.IpExterno = (String)jsonObject.get("ip");
+                    PopularIp();
+                    PostIp();
+                    Log.i("RespostaGet", json);
+                }catch(Exception ex)
+                {
+                    Log.i("RespostaGet", ex.getMessage());
+                }
+                break;
+            case "POSTIP":
+                Tab_Ip tabIp;
+                tabIp = JsonObjetcManagement.ParseJsonObject(json, Tab_Ip.class);
+                txtView.setText(tabIp.getIp());
+                break;
         }
     }
+
     @Override
     public String GetJsonParameters()
     {
         return jsonParameter.toString();
     }
-
-    private void IniciarControlesFacebook()
+    @Override
+    public void ClearParameters()
     {
-        loginButton = (LoginButton)findViewById(R.id.fb_login_bn);
-        callbackManager = CallbackManager.Factory.create();
-        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>()
-        {
-            @Override
-            public void onSuccess(LoginResult loginResult)
-            {
-                Toast.makeText(MainActivity.this, "", Toast.LENGTH_LONG).show();
-            }
-            @Override
-            public void onCancel()
-            {
-                if(AccessToken.getCurrentAccessToken()!=null)
-                    LoginManager.getInstance().logOut();
-            }
-            @Override
-            public void onError(FacebookException error)
-            {
-                if(AccessToken.getCurrentAccessToken()!=null)
-                    LoginManager.getInstance().logOut();
-            }
-        });
+        jsonParameter = null;
     }
+
+//    private void IniciarControlesFacebook()
+//    {
+//        loginButton = (LoginButton)findViewById(R.id.fb_login_bn);
+//        callbackManager = CallbackManager.Factory.create();
+//        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>()
+//        {
+//            @Override
+//            public void onSuccess(LoginResult loginResult)
+//            {
+//                Toast.makeText(MainActivity.this, "", Toast.LENGTH_LONG).show();
+//            }
+//            @Override
+//            public void onCancel()
+//            {
+//                if(AccessToken.getCurrentAccessToken()!=null)
+//                    LoginManager.getInstance().logOut();
+//            }
+//            @Override
+//            public void onError(FacebookException error)
+//            {
+//                if(AccessToken.getCurrentAccessToken()!=null)
+//                    LoginManager.getInstance().logOut();
+//            }
+//        });
+//    }
     private void BuscarIp()
     {
         ConstantsClass.IpExterno = "";

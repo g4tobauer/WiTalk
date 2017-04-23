@@ -49,8 +49,8 @@ public class PostAsyncTask extends AsyncTask<String,String,String>
         try
         {
             String urlParameters  = _jsonNotifiable.GetJsonParameters();
+            _jsonNotifiable.ClearParameters();
             URL url = new URL( params[0] );
-//            String urlParameters  = "[{\"pk_int_IdIp\":1,\"str_Ip\":\"192.168.0.165\",\"dte_DataAtualizacao\":\"2017-04-21T12:36:57.09\",\"bit_IpAtivo\":true,\"Tab_Grupo\":[],\"Tab_Grupo_Usuario_Relacionamento\":[],\"Tab_Mensagem\":[],\"Tab_Mensagem_Visualizada_Usuario\":[],\"Tab_Usuario\":[]}]";
             urlConnection = (HttpURLConnection)url.openConnection();
             urlConnection.setUseCaches(false);
             urlConnection.setDoOutput(true);
@@ -61,14 +61,10 @@ public class PostAsyncTask extends AsyncTask<String,String,String>
             urlConnection.getOutputStream().write(urlParameters.getBytes());
             Reader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), "UTF-8"));
 
-            String t = "";
-
             for (int c; (c = in.read()) >= 0;)
             {
-                t = t.concat(String.valueOf((char)c));
+                result.append((char)c);
             }
-            t = t.trim();
-
 
         }catch( Exception e) {
             e.printStackTrace();
@@ -77,14 +73,15 @@ public class PostAsyncTask extends AsyncTask<String,String,String>
             if (urlConnection != null)
                 urlConnection.disconnect();
         }
-        return result.toString();
+        return result.toString().trim();
     }
     //Params
 
     @Override
-    protected void onPostExecute(String s)
+    protected void onPostExecute(String result)
     {
-        super.onPostExecute(s);
+        super.onPostExecute(result);
+        _jsonNotifiable.ExecuteNotify("POSTIP", result);
         if(load !=null)
             load.dismiss();
     }

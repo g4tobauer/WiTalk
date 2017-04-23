@@ -77,7 +77,7 @@ public class GetAsyncTask extends AsyncTask<String,Integer,String>
     @Override
     protected void onPostExecute(String json) {
         super.onPostExecute(json);
-        _jsonNotifiable.ExecuteNotify(json);
+        _jsonNotifiable.ExecuteNotify("GETIP",json);
         if(load !=null)
             load.dismiss();
         load = null;

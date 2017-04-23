@@ -21,11 +21,19 @@ import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 
 public class JsonObjetcManagement
 {
-    public static <T extends EntityBase>T ParseJsonObject(JSONObject jsonObject, Class<T> objClass)
+    public static <T extends EntityBase>T ParseJsonObject(String jsonString, Class<T> objClass)
     {
+        T entityResult = null;
         Gson gson = new GsonBuilder()
                 .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").create();
-        return gson.fromJson(jsonObject.toString(), objClass);
+        try
+        {
+            entityResult = gson.fromJson(jsonString, objClass);
+        }catch (Exception ex)
+        {
+            Log.i("JsonObjetcManagement", "ParseJsonObject = "+ex.getMessage());
+        }
+        return entityResult;
     }
     public static <T extends EntityBase>JSONObject ParseObjectJson(T objEntity)
     {
@@ -35,7 +43,7 @@ public class JsonObjetcManagement
             jsonObject = new JSONObject(new Gson().toJson(objEntity));
         }catch (Exception ex)
         {
-            Log.i("ParseTabIpToJsonObject", "ParseTabIpToJsonObject = "+ex.getMessage());
+            Log.i("JsonObjetcManagement", "ParseObjectJson = "+ex.getMessage());
         }
         return jsonObject;
     }

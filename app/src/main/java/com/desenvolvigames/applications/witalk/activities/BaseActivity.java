@@ -21,7 +21,10 @@ public class BaseActivity extends AppCompatActivity implements IJsonNotifiable
     }
 
     @Override
-    public void ExecuteNotify(String json){}
+    public void ClearParameters(){}
+
+    @Override
+    public void ExecuteNotify(String tag, String json){}
 
     @Override
     public String GetJsonParameters(){return null;}

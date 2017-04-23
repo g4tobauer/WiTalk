@@ -8,6 +8,7 @@ import org.json.JSONObject;
 
 public interface IJsonNotifiable
 {
-    void ExecuteNotify(String json);
     String GetJsonParameters();
+    void ClearParameters();
+    void ExecuteNotify(String tag, String json);
 }
