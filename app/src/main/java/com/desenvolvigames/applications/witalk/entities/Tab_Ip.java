@@ -21,12 +21,8 @@ public class Tab_Ip extends EntityBase
     private ArrayList<Tab_Grupo_Usuario_Relacionamento> Tab_Grupo_Usuario_Relacionamento;
     private ArrayList<Tab_Grupo> Tab_Grupo;
 
-    public void setIp(String strIp)
-    {
-        str_Ip = strIp;
-    }
-    public String getIp()
-    {
-        return str_Ip;
-    }
+    public void setIp(String strIp){str_Ip = strIp;}
+    public String getIp(){return str_Ip;}
+
+    public Integer getPkIP(){return this.pk_int_IdIp;}
 }

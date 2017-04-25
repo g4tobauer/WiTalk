@@ -26,6 +26,8 @@ public class GetAsyncTask extends AsyncTask<String,Integer,String>
     private ProgressDialog load;
     private Context _context;
     private IJsonNotifiable _jsonNotifiable;
+    private URL url;
+
     public GetAsyncTask(BaseActivity baseActivity)
     {
         _context = baseActivity;
@@ -52,7 +54,7 @@ public class GetAsyncTask extends AsyncTask<String,Integer,String>
         HttpURLConnection urlConnection = null;
         try
         {
-            URL url = new URL(params[0]);
+            url = new URL(params[0]);
             urlConnection = (HttpURLConnection) url.openConnection();
             InputStream in = new BufferedInputStream(urlConnection.getInputStream());
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
@@ -77,7 +79,7 @@ public class GetAsyncTask extends AsyncTask<String,Integer,String>
     @Override
     protected void onPostExecute(String json) {
         super.onPostExecute(json);
-        _jsonNotifiable.ExecuteNotify("GETIP",json);
+        _jsonNotifiable.ExecuteNotify(url.toString(),json);
         if(load !=null)
             load.dismiss();
         load = null;

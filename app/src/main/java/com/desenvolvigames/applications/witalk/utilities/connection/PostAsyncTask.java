@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.desenvolvigames.applications.witalk.activities.BaseActivity;
 import com.desenvolvigames.applications.witalk.interfaces.IJsonNotifiable;
+import com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -23,6 +24,8 @@ public class PostAsyncTask extends AsyncTask<String,String,String>
     private ProgressDialog load;
     private Context _context;
     private IJsonNotifiable _jsonNotifiable;
+    private URL url;
+
     public PostAsyncTask(BaseActivity activity)
     {
         _context = activity;
@@ -50,7 +53,7 @@ public class PostAsyncTask extends AsyncTask<String,String,String>
         {
             String urlParameters  = _jsonNotifiable.GetJsonParameters();
             _jsonNotifiable.ClearParameters();
-            URL url = new URL( params[0] );
+            url = new URL(params[0]);
             urlConnection = (HttpURLConnection)url.openConnection();
             urlConnection.setUseCaches(false);
             urlConnection.setDoOutput(true);
@@ -81,7 +84,7 @@ public class PostAsyncTask extends AsyncTask<String,String,String>
     protected void onPostExecute(String result)
     {
         super.onPostExecute(result);
-        _jsonNotifiable.ExecuteNotify("POSTIP", result);
+        _jsonNotifiable.ExecuteNotify(url.toString(), result);
         if(load !=null)
             load.dismiss();
     }

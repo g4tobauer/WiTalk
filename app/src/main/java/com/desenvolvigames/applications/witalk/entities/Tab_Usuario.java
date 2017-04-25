@@ -19,10 +19,10 @@ public class Tab_Usuario extends EntityBase
         dte_DataAtualizacao = Calendar.getInstance().getTime();
         bit_UsuarioAtivo = true;
     }
-    protected Integer pk_int_IdUsuario;
-    protected Integer fk_int_IdIp;
-    protected String str_UsuarioKEY;
-    protected String str_NomeUsuario;
-    protected Date dte_DataAtualizacao;
-    protected Boolean bit_UsuarioAtivo;
+    public Integer pk_int_IdUsuario;
+    public Integer fk_int_IdIp;
+    public String str_UsuarioKEY;
+    public String str_NomeUsuario;
+    public Date dte_DataAtualizacao;
+    public Boolean bit_UsuarioAtivo;
 }
