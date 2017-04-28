@@ -1,4 +1,4 @@
-package com.desenvolvigames.applications.witalk.entities;
+package com.desenvolvigames.applications.witalk.entities.old;
 
 
 import java.util.Calendar;

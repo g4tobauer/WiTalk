@@ -5,9 +5,8 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.desenvolvigames.applications.witalk.activities.BaseActivity;
+import com.desenvolvigames.applications.witalk.activities.old.BaseActivity;
 import com.desenvolvigames.applications.witalk.interfaces.IJsonNotifiable;
-import com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

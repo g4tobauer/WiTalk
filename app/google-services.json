@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "492285105268",
+    "firebase_url": "https://witalk-20ae3.firebaseio.com",
+    "project_id": "witalk-20ae3",
+    "storage_bucket": "witalk-20ae3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:492285105268:android:752f4d3ad6c397af",
+        "android_client_info": {
+          "package_name": "com.desenvolvigames.applications.witalk"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "492285105268-tm6sd1tqok51lo0qpv0nj73he3gaj17e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.desenvolvigames.applications.witalk",
+            "certificate_hash": "72601bb80015e4e98419c2c9d1577c0424219136"
+          }
+        },
+        {
+          "client_id": "492285105268-k83v9qh5amsi6eumqhcds9nfpn7dus25.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtrDkxQyuq6_uLJUzfGiXSuSda9H2vwMk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "492285105268-k83v9qh5amsi6eumqhcds9nfpn7dus25.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

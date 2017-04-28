@@ -1,16 +1,15 @@
-package com.desenvolvigames.applications.witalk.activities;
+package com.desenvolvigames.applications.witalk.activities.old;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.desenvolvigames.applications.witalk.R;
 import com.desenvolvigames.applications.witalk.control.JsonObjetcManagement;
-import com.desenvolvigames.applications.witalk.entities.Tab_Ip;
-import com.desenvolvigames.applications.witalk.entities.Tab_Usuario;
+import com.desenvolvigames.applications.witalk.entities.old.Tab_Ip;
+import com.desenvolvigames.applications.witalk.entities.old.Tab_Usuario;
 import com.desenvolvigames.applications.witalk.interfaces.IJsonNotifiable;
 import com.desenvolvigames.applications.witalk.utilities.connection.GetAsyncTask;
 import com.desenvolvigames.applications.witalk.utilities.connection.PostAsyncTask;

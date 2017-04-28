@@ -5,7 +5,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.desenvolvigames.applications.witalk.activities.BaseActivity;
+import com.desenvolvigames.applications.witalk.activities.old.BaseActivity;
 import com.desenvolvigames.applications.witalk.interfaces.IJsonNotifiable;
 
 import java.io.BufferedInputStream;
@@ -14,8 +14,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 
 /**
  * Created by Joao on 16/04/2017.
