@@ -1,4 +1,4 @@
-package com.desenvolvigames.applications.witalk.fcm;
+package com.desenvolvigames.applications.witalk.fcm.services;
 
 import android.util.Log;
 
@@ -24,6 +24,5 @@ public class WiTalkFirebaseInstanceIdService extends FirebaseInstanceIdService
     }
     private void sendRegistrationToServer(String refreshedToken)
     {
-
     }
 }

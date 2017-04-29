@@ -1,4 +1,4 @@
-package com.desenvolvigames.applications.witalk.fcm;
+package com.desenvolvigames.applications.witalk.fcm.services;
 
 import android.util.Log;
 
