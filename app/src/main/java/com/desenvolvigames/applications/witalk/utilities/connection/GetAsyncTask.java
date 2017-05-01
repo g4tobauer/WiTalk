@@ -26,10 +26,10 @@ public class GetAsyncTask extends AsyncTask<String,Integer,String>
     private IJsonNotifiable _jsonNotifiable;
     private URL url;
 
-    public GetAsyncTask(BaseActivity baseActivity)
+    public GetAsyncTask(IJsonNotifiable jsonNotifiable)
     {
-        _context = baseActivity;
-        _jsonNotifiable = baseActivity;
+        _context = jsonNotifiable.GetContext();
+        _jsonNotifiable = jsonNotifiable;
     }
     //Progress
     @Override

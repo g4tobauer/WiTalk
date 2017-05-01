@@ -1,5 +1,7 @@
 package com.desenvolvigames.applications.witalk.interfaces;
 
+import android.content.Context;
+
 import org.json.JSONObject;
 
 /**
@@ -9,6 +11,7 @@ import org.json.JSONObject;
 public interface IJsonNotifiable
 {
     String GetJsonParameters();
+    Context GetContext();
     void ClearParameters();
     void ExecuteNotify(String tag, String json);
 }

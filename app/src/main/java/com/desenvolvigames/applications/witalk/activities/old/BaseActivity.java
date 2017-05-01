@@ -1,5 +1,6 @@
 package com.desenvolvigames.applications.witalk.activities.old;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -38,13 +39,10 @@ public class BaseActivity extends AppCompatActivity implements IJsonNotifiable
 
     @Override
     protected void onStop(){super.onStop();}
-
     @Override
     protected void onDestroy(){super.onDestroy();}
-
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_main);
@@ -52,14 +50,13 @@ public class BaseActivity extends AppCompatActivity implements IJsonNotifiable
         IniciarControlesFacebook();
     }
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
 //        super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode,resultCode,data);
     }
 
-    public void ExecuteNotify(String tag, String json)
-    {
+    @Override
+    public void ExecuteNotify(String tag, String json){
         switch (tag)
         {
             case ConstantsClass.GetIpUrl:
@@ -86,20 +83,22 @@ public class BaseActivity extends AppCompatActivity implements IJsonNotifiable
                 break;
         }
     }
-
-
+    @Override
     public String GetJsonParameters()
     {
         return jsonParameter.toString();
     }
-
+    @Override
     public void ClearParameters()
     {
         jsonParameter = null;
     }
+    @Override
+    public Context GetContext() {
+        return this;
+    }
 
-    private void IniciarControlesFacebook()
-    {
+    private void IniciarControlesFacebook(){
         loginButton = (LoginButton)findViewById(R.id.fb_login_bn);
         callbackManager = CallbackManager.Factory.create();
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>()
@@ -151,14 +150,12 @@ public class BaseActivity extends AppCompatActivity implements IJsonNotifiable
             }
         });
     }
-    private void BuscarIp()
-    {
+    private void BuscarIp(){
         ConstantsClass.IpExterno = "";
         GetAsyncTask task = new GetAsyncTask(BaseActivity.this);
         task.execute(ConstantsClass.GetIpUrl);
     }
-    private void PostIp(String ip)
-    {
+    private void PostIp(String ip){
         ConstantsClass.IpExterno = ip;
         Tab_Ip tabIp = new Tab_Ip();
         tabIp.setIp(ConstantsClass.IpExterno);
@@ -166,8 +163,7 @@ public class BaseActivity extends AppCompatActivity implements IJsonNotifiable
         PostAsyncTask task = new PostAsyncTask(BaseActivity.this);
         task.execute(ConstantsClass.PostIpObjectUrl);
     }
-    private void PostUsuario()
-    {
+    private void PostUsuario(){
         jsonParameter = JsonObjetcManagement.ParseObjectJson(_tabUsuario);
         PostAsyncTask task = new PostAsyncTask(BaseActivity.this);
         task.execute(ConstantsClass.PostUsuarioObjectUrl);
