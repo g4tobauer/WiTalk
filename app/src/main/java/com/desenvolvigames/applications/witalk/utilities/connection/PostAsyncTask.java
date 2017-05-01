@@ -5,8 +5,8 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.desenvolvigames.applications.witalk.activities.old.BaseActivity;
-import com.desenvolvigames.applications.witalk.interfaces.IJsonNotifiable;
+import com.desenvolvigames.applications.witalk.interfaces.IAsyncNotifiable;
+import com.desenvolvigames.applications.witalk.interfaces.IParameterNotifiable;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -22,18 +22,16 @@ public class PostAsyncTask extends AsyncTask<String,String,String>
 {
     private ProgressDialog load;
     private Context _context;
-    private IJsonNotifiable _jsonNotifiable;
+    private IParameterNotifiable _parameterNotifiable;
     private URL url;
 
-    public PostAsyncTask(BaseActivity activity)
-    {
-        _context = activity;
-        _jsonNotifiable = activity;
+    public PostAsyncTask(IParameterNotifiable parameterNotifiable){
+        _context = parameterNotifiable.GetContext();
+        _parameterNotifiable = parameterNotifiable;
     }
     //Progress
     @Override
-    protected void onProgressUpdate(String... values)
-    {
+    protected void onProgressUpdate(String... values){
         super.onProgressUpdate(values);
         Log.i("AsyncTask", "Exibindo ProgressDialog na tela Thread: " + Thread.currentThread().getName());
         load = ProgressDialog.show(_context, "Por favor Aguarde ...","Testando ...");
@@ -43,15 +41,12 @@ public class PostAsyncTask extends AsyncTask<String,String,String>
     //Result
     //Params
     @Override
-    protected String doInBackground(String... params)
-    {
-
+    protected String doInBackground(String... params){
         StringBuilder result = new StringBuilder();
         HttpURLConnection urlConnection = null;
-        try
-        {
-            String urlParameters  = _jsonNotifiable.GetJsonParameters();
-            _jsonNotifiable.ClearParameters();
+        try{
+            String urlParameters  = _parameterNotifiable.GetParameters();
+            _parameterNotifiable.ClearParameters();
             url = new URL(params[0]);
             urlConnection = (HttpURLConnection)url.openConnection();
             urlConnection.setUseCaches(false);
@@ -63,8 +58,8 @@ public class PostAsyncTask extends AsyncTask<String,String,String>
             urlConnection.getOutputStream().write(urlParameters.getBytes());
             Reader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), "UTF-8"));
 
-            for (int c; (c = in.read()) >= 0;)
-            {
+            for (int c; (c = in.read()) >= 0;){
+                publishProgress("");
                 result.append((char)c);
             }
 
@@ -80,10 +75,9 @@ public class PostAsyncTask extends AsyncTask<String,String,String>
     //Params
 
     @Override
-    protected void onPostExecute(String result)
-    {
+    protected void onPostExecute(String result){
         super.onPostExecute(result);
-        _jsonNotifiable.ExecuteNotify(url.toString(), result);
+        _parameterNotifiable.ExecuteNotify(url.toString(), result);
         if(load !=null)
             load.dismiss();
     }

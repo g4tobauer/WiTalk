@@ -44,7 +44,7 @@ public class WiTalkFirebaseAuthentication
                 if (user != null){
                     if(mUsuario == null){
                         mUsuario = new Usuario(user.getProviderData());
-                        mStartActivity.teste();
+                        mStartActivity.beginProgram();
                     }
                 }
                 else{

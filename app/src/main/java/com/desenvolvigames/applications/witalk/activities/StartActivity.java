@@ -9,10 +9,8 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.desenvolvigames.applications.witalk.R;
-import com.desenvolvigames.applications.witalk.activities.old.BaseActivity;
-import com.desenvolvigames.applications.witalk.entities.Usuario;
 import com.desenvolvigames.applications.witalk.fcm.authenticacion.WiTalkFirebaseAuthentication;
-import com.desenvolvigames.applications.witalk.interfaces.IJsonNotifiable;
+import com.desenvolvigames.applications.witalk.interfaces.IAsyncNotifiable;
 import com.desenvolvigames.applications.witalk.utilities.connection.GetAsyncTask;
 import com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass;
 import com.facebook.CallbackManager;
@@ -24,9 +22,8 @@ import com.facebook.login.widget.LoginButton;
 
 import org.json.JSONObject;
 
-public class StartActivity extends AppCompatActivity implements IJsonNotifiable
+public class StartActivity extends AppCompatActivity implements IAsyncNotifiable
 {
-    private Usuario mUsuario;
     private WiTalkFirebaseAuthentication mWiTalkFirebaseAuthentication;
     private LoginButton mLoginButton;
     private CallbackManager mCallbackManager;
@@ -62,28 +59,23 @@ public class StartActivity extends AppCompatActivity implements IJsonNotifiable
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         mCallbackManager.onActivityResult(requestCode,resultCode,data);
     }
-
     @Override
-    public String GetJsonParameters() {
-        return null;
-    }
-    @Override
-    public void ClearParameters() {
-
-    }
-    @Override
-    public void ExecuteNotify(String tag, String json) {
+    public void ExecuteNotify(String tag, String result) {
         try {
             switch (tag) {
                 case ConstantsClass.GetIpUrl:
-                    ConstantsClass.IpExterno = new JSONObject(json).getString("ip");
-                    mUsuario.setIpUsuario(ConstantsClass.IpExterno);
+                    ConstantsClass.IpExterno = new JSONObject(result).getString("ip");
+                    ConstantsClass.Usuario.setIpUsuario(ConstantsClass.IpExterno);
+                    Intent intent = new Intent(StartActivity.this, ConnectActivity.class);
+                    startActivity(intent);
+//                    finish();
                     break;
             }
         }catch (Exception ex){
             Log.w("TAG", "signInWithCredential", ex);
         }
     }
+
     @Override
     public Context GetContext() {
         return this;
@@ -106,11 +98,10 @@ public class StartActivity extends AppCompatActivity implements IJsonNotifiable
             public void onError(FacebookException error){Log.d("TAG", "facebook:onError", error);}
         });
     }
-    public void teste(){
-        mUsuario = mWiTalkFirebaseAuthentication.getUsuario();
+    public void beginProgram(){
+        ConstantsClass.Usuario = mWiTalkFirebaseAuthentication.getUsuario();
         ConstantsClass.IpExterno = "";
         GetAsyncTask task = new GetAsyncTask(StartActivity.this);
         task.execute(ConstantsClass.GetIpUrl);
-        task.execute();
     }
 }

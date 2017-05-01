@@ -5,8 +5,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.desenvolvigames.applications.witalk.activities.old.BaseActivity;
-import com.desenvolvigames.applications.witalk.interfaces.IJsonNotifiable;
+import com.desenvolvigames.applications.witalk.interfaces.IAsyncNotifiable;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -19,22 +18,20 @@ import java.net.URL;
  * Created by Joao on 16/04/2017.
  */
 
-public class GetAsyncTask extends AsyncTask<String,Integer,String>
+public class GetAsyncTask extends AsyncTask<String,String,String>
 {
     private ProgressDialog load;
     private Context _context;
-    private IJsonNotifiable _jsonNotifiable;
+    private IAsyncNotifiable _asyncNotifiable;
     private URL url;
 
-    public GetAsyncTask(IJsonNotifiable jsonNotifiable)
-    {
-        _context = jsonNotifiable.GetContext();
-        _jsonNotifiable = jsonNotifiable;
+    public GetAsyncTask(IAsyncNotifiable asyncNotifiable){
+        _context = asyncNotifiable.GetContext();
+        _asyncNotifiable = asyncNotifiable;
     }
     //Progress
     @Override
-    protected void onProgressUpdate(Integer... values)
-    {
+    protected void onProgressUpdate(String... values){
         super.onProgressUpdate(values);
         Log.i("onProgressUpdate", "Exibindo ProgressDialog na tela Thread: " + Thread.currentThread().getName());
         if(load == null)
@@ -46,27 +43,23 @@ public class GetAsyncTask extends AsyncTask<String,Integer,String>
     //Result
     //Params
     @Override
-    protected String doInBackground(String... params)
-    {
+    protected String doInBackground(String... params){
         StringBuilder result = new StringBuilder();
         HttpURLConnection urlConnection = null;
-        try
-        {
+        try{
             url = new URL(params[0]);
             urlConnection = (HttpURLConnection) url.openConnection();
             InputStream in = new BufferedInputStream(urlConnection.getInputStream());
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             String line;
-            while ((line = reader.readLine()) != null)
-            {
+            while ((line = reader.readLine()) != null){
+                publishProgress("");
                 result.append(line);
             }
-        }catch(Exception ex)
-        {
+        }catch(Exception ex){
             ex.printStackTrace();
         }
-        finally
-        {
+        finally{
             if (urlConnection != null)
                 urlConnection.disconnect();
         }
@@ -77,7 +70,7 @@ public class GetAsyncTask extends AsyncTask<String,Integer,String>
     @Override
     protected void onPostExecute(String json) {
         super.onPostExecute(json);
-        _jsonNotifiable.ExecuteNotify(url.toString(),json);
+        _asyncNotifiable.ExecuteNotify(url.toString(),json);
         if(load !=null)
             load.dismiss();
         load = null;

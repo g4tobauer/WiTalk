@@ -27,12 +27,16 @@
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
-        <service
-            android:name=".fcm.services.WiTalkFirebaseMessagingService">
+        <service android:name=".fcm.services.WiTalkFirebaseMessagingService">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
+        <activity
+            android:name=".activities.ConnectActivity"
+            android:label="@string/title_activity_connect"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

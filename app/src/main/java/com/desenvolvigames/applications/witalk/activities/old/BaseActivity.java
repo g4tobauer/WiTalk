@@ -11,7 +11,7 @@ import com.desenvolvigames.applications.witalk.R;
 import com.desenvolvigames.applications.witalk.control.JsonObjetcManagement;
 import com.desenvolvigames.applications.witalk.entities.old.Tab_Ip;
 import com.desenvolvigames.applications.witalk.entities.old.Tab_Usuario;
-import com.desenvolvigames.applications.witalk.interfaces.IJsonNotifiable;
+import com.desenvolvigames.applications.witalk.interfaces.IParameterNotifiable;
 import com.desenvolvigames.applications.witalk.utilities.connection.GetAsyncTask;
 import com.desenvolvigames.applications.witalk.utilities.connection.PostAsyncTask;
 import com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass;
@@ -28,7 +28,7 @@ import com.facebook.login.widget.LoginButton;
 
 import org.json.JSONObject;
 
-public class BaseActivity extends AppCompatActivity implements IJsonNotifiable
+public class BaseActivity extends AppCompatActivity implements IParameterNotifiable
 {
     private Tab_Ip _tabIp;
     private Tab_Usuario _tabUsuario;
@@ -56,21 +56,21 @@ public class BaseActivity extends AppCompatActivity implements IJsonNotifiable
     }
 
     @Override
-    public void ExecuteNotify(String tag, String json){
+    public void ExecuteNotify(String tag, String result){
         switch (tag)
         {
             case ConstantsClass.GetIpUrl:
                 try
                 {
-                    PostIp((String)new JSONObject(json).get("ip"));
-                    Log.i("RespostaGet", json);
+                    PostIp((String)new JSONObject(result).get("ip"));
+                    Log.i("RespostaGet", result);
                 }catch(Exception ex)
                 {
                     Log.i("RespostaGet", ex.getMessage());
                 }
                 break;
             case ConstantsClass.PostIpObjectUrl:
-                _tabIp = JsonObjetcManagement.ParseJsonObject(json, Tab_Ip.class);
+                _tabIp = JsonObjetcManagement.ParseJsonObject(result, Tab_Ip.class);
                 if(ConstantsClass.IpExterno.equals(_tabIp.getIp()))
                 {
                     _tabUsuario.fk_int_IdIp = _tabIp.getPkIP();
@@ -78,21 +78,18 @@ public class BaseActivity extends AppCompatActivity implements IJsonNotifiable
                 }
                 break;
             case ConstantsClass.PostUsuarioObjectUrl:
-                _tabUsuario = JsonObjetcManagement.ParseJsonObject(json, Tab_Usuario.class);
+                _tabUsuario = JsonObjetcManagement.ParseJsonObject(result, Tab_Usuario.class);
                 _tabUsuario = null;
                 break;
         }
-    }
-    @Override
-    public String GetJsonParameters()
-    {
-        return jsonParameter.toString();
     }
     @Override
     public void ClearParameters()
     {
         jsonParameter = null;
     }
+    @Override
+    public String GetParameters() {return jsonParameter.toString();}
     @Override
     public Context GetContext() {
         return this;

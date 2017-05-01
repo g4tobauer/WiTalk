@@ -8,10 +8,8 @@ import org.json.JSONObject;
  * Created by Joao on 19/04/2017.
  */
 
-public interface IJsonNotifiable
+public interface IAsyncNotifiable
 {
-    String GetJsonParameters();
     Context GetContext();
-    void ClearParameters();
-    void ExecuteNotify(String tag, String json);
+    void ExecuteNotify(String tag, String result);
 }

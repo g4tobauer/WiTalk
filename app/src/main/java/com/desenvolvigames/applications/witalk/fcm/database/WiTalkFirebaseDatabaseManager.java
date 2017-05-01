@@ -1,5 +1,6 @@
 package com.desenvolvigames.applications.witalk.fcm.database;
 
+import com.desenvolvigames.applications.witalk.interfaces.IDataBaseManageable;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -12,24 +13,26 @@ import com.google.firebase.database.ValueEventListener;
 
 public class WiTalkFirebaseDatabaseManager
 {
-    DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
-    DatabaseReference mConditionRef;
+    private IDataBaseManageable mManageable;
+    private DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
+    private DatabaseReference mConditionRef;
 
-    public WiTalkFirebaseDatabaseManager(String ref){
-        mConditionRef = mRootRef.child(ref);
+    public WiTalkFirebaseDatabaseManager(IDataBaseManageable manageable){
+        mManageable = manageable;
+        mConditionRef = mRootRef.child(mManageable.GetRoot());
         IniciarFirebaseDatabase();
     }
     private void IniciarFirebaseDatabase(){
         mConditionRef.addValueEventListener(new ValueEventListener(){
             @Override
             public void onDataChange(DataSnapshot dataSnapshot){
-                Object obj = dataSnapshot.getValue();
+                mManageable.DataSnapshotUpdate(dataSnapshot);
             }
             @Override
             public void onCancelled(DatabaseError databaseError){}
         });
     }
-    public DatabaseReference getRef(String key){
-        return mConditionRef.child(key);
+    public DatabaseReference getRef(){
+        return mConditionRef;
     }
 }
