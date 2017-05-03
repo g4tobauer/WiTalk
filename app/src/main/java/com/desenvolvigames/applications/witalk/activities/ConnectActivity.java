@@ -4,7 +4,9 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.widget.TextView;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
 import com.desenvolvigames.applications.witalk.R;
 import com.desenvolvigames.applications.witalk.entities.Usuario;
@@ -12,7 +14,7 @@ import com.desenvolvigames.applications.witalk.interfaces.IAsyncNotifiable;
 import com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass;
 
 public class ConnectActivity extends AppCompatActivity implements IAsyncNotifiable{
-    private TextView teste;
+    private Button btnConnect;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,13 +22,24 @@ public class ConnectActivity extends AppCompatActivity implements IAsyncNotifiab
         setContentView(R.layout.activity_connect);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        teste = (TextView) findViewById(R.id.txtTeste);
-        ConstantsClass.Usuario.sincronize(ConnectActivity.this, ConstantsClass.Usuario.getIpUsuario);
-//        if(user.isReleased());
+        initControls();
+        initEventos();
+        sincronize();
+    }
 
-//        String teste = user.getIpUsuario();
-//        Log.d("ERRO",teste);
-//        teste = null;
+    private void initControls(){
+        btnConnect = (Button) findViewById(R.id.btnConnect);
+    }
+    private void initEventos(){
+        btnConnect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ConstantsClass.Usuario.connect();
+            }
+        });
+    }
+    private void sincronize(){
+        ConstantsClass.Usuario.Sincronize(ConnectActivity.this, ConstantsClass.Usuario.sincronize);
     }
 
     @Override
@@ -37,9 +50,10 @@ public class ConnectActivity extends AppCompatActivity implements IAsyncNotifiab
     @Override
     public void ExecuteNotify(String tag, String result) {
         switch (tag){
-            case Usuario.getIpUsuario:
-                String ip = result;
-                teste.setText(ip);
+            case Usuario.sincronize:
+                if(Usuario.sincronize.equals(result)){
+                    Toast.makeText(ConnectActivity.this, "Usuario Sincronizado!", Toast.LENGTH_SHORT);
+                }
                 break;
         }
     }

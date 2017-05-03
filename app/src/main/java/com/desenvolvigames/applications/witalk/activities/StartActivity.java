@@ -75,7 +75,6 @@ public class StartActivity extends AppCompatActivity implements IAsyncNotifiable
             Log.w("TAG", "signInWithCredential", ex);
         }
     }
-
     @Override
     public Context GetContext() {
         return this;
