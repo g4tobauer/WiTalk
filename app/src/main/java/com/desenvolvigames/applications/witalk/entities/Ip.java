@@ -17,10 +17,12 @@ public class Ip extends EntityBase {
 
     private static final String IpNode = "IpNode";
     private String mIp;
-    public static final String sincronize = "IpSincronize";
+    public static final String SINCRONIZE = "IpSincronize";
 
     public Ip(){
+        mIsReleased = true;
         mIp = ConstantsClass.Usuario.getIpUsuario().replace(".","");
+        mWiTalkFirebaseDatabaseManager = new WiTalkFirebaseDatabaseManager(this);
         Init();
     }
 
@@ -28,50 +30,37 @@ public class Ip extends EntityBase {
         @Override
         protected String doInBackground(String... params) {
             String tag = params[0];
-            if (IsReleased()) {
-                switch (tag) {
-                    case sincronize:
-                        publishProgress();
-                        break;
-                }
+            if (!IsReleased()) {
+                tag = "false";
             }
             return tag;
         }
         protected void onPostExecute(String tag) {
             super.onPostExecute(tag);
-            mAsyncNotifiable.ExecuteNotify(tag, sincronize);
+            mAsyncNotifiable.ExecuteNotify(tag, Ip.SINCRONIZE);
             if(load !=null)
                 load.dismiss();
             load = null;
-        }
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            super.onProgressUpdate(values);
-            Log.i("onProgressUpdate", "Exibindo ProgressDialog na tela Thread: " + Thread.currentThread().getName());
-            if(load == null)
-                load = ProgressDialog.show(mAsyncNotifiable.GetContext(), "Por favor Aguarde ...","Sincronizando ...",true, false);
-            load.setMessage("Sincronizando ... ");
         }
     }
 
     @Override
     protected void Init(){
+        DatabaseReference ref = GetRef().child(ConstantsClass.Usuario.getAuthenticationId());
+        ref.child("Nome").setValue(ConstantsClass.Usuario.getNomeUsuario());
+        ref.child("UserMessageToken").setValue(ConstantsClass.Usuario.getUserMessageToken());
+    }
+    @Override
+    public void Sincronize(IAsyncNotifiable asyncNotifiable) {
         mIsReleased = false;
-        mWiTalkFirebaseDatabaseManager = new WiTalkFirebaseDatabaseManager(this);
-        DatabaseReference ref = GetRef();
-        ref.child(ConstantsClass.Usuario.getAuthenticationId()).setValue("teste");
-    }
-    @Override
-    public void Sincronize(IAsyncNotifiable asyncNotifiable, String tag) {
         mAsyncNotifiable = asyncNotifiable;
-        new IpAsyncTask().execute(tag);
-    }
-    @Override
-    public void ExecuteNotify(String tag, String result) {
+
+        if(mAsyncTask!=null){mAsyncTask.cancel(true);}
+        mAsyncTask = new IpAsyncTask();
+        mAsyncTask .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Ip.SINCRONIZE);
     }
     @Override
     public String GetRoot() {
         return IpNode.concat("/").concat(mIp);
     }
-
 }

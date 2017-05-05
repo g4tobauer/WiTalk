@@ -39,21 +39,23 @@ public class ConnectActivity extends AppCompatActivity implements IAsyncNotifiab
         });
     }
     private void sincronize(){
-        ConstantsClass.Usuario.Sincronize(ConnectActivity.this, ConstantsClass.Usuario.sincronize);
+        ConstantsClass.Usuario.Sincronize(ConnectActivity.this);
     }
 
     @Override
     public Context GetContext() {
         return this;
     }
-
     @Override
     public void ExecuteNotify(String tag, String result) {
         switch (tag){
-            case Usuario.sincronize:
-                if(Usuario.sincronize.equals(result)){
-                    Toast.makeText(ConnectActivity.this, "Usuario Sincronizado!", Toast.LENGTH_SHORT);
+            case Usuario.SINCRONIZE:
+                if(Usuario.SINCRONIZE.equals(result)){
+                    Toast.makeText(ConnectActivity.this, "Usuario Sincronizado!", Toast.LENGTH_SHORT).show();
+                    ConstantsClass.Usuario.Sincronize(ConnectActivity.this);
                 }
+                break;
+            default:
                 break;
         }
     }

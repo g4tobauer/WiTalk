@@ -2,6 +2,7 @@ package com.desenvolvigames.applications.witalk.entities;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.desenvolvigames.applications.witalk.fcm.database.WiTalkFirebaseDatabaseManager;
@@ -17,6 +18,7 @@ import com.google.firebase.database.DatabaseReference;
 public abstract class EntityBase implements IDataBaseManageable, IAsyncNotifiable {
 
     protected boolean mIsReleased;
+    protected AsyncTask<String, Void, String> mAsyncTask;
     protected ProgressDialog load;
     protected IAsyncNotifiable mAsyncNotifiable;
     protected DataSnapshot mDataSnapshot;
@@ -33,9 +35,9 @@ public abstract class EntityBase implements IDataBaseManageable, IAsyncNotifiabl
     }
 
     protected boolean IsReleased(){
-        while (!mIsReleased) {
+        while (!mIsReleased && !mAsyncTask.isCancelled()) {
             try {
-                Thread.sleep(100);
+                Thread.sleep(3000);
             } catch (Exception ex) {
                 Log.w("Exception: ", ex);
             }
@@ -47,5 +49,10 @@ public abstract class EntityBase implements IDataBaseManageable, IAsyncNotifiabl
     }
 
     protected abstract void Init();
-    public abstract void Sincronize(IAsyncNotifiable asyncNotifiable, String tag);
+    public abstract void Sincronize(IAsyncNotifiable asyncNotifiable);
+    public void ForceRelease(){
+        mAsyncTask.cancel(true);
+    }
+    @Override
+    public void ExecuteNotify(String tag, String result) {}
 }

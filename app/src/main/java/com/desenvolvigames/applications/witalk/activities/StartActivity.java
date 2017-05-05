@@ -52,8 +52,9 @@ public class StartActivity extends AppCompatActivity implements IAsyncNotifiable
     }
     @Override
     protected void onDestroy(){
-        super.onDestroy();
+        ConstantsClass.Usuario.ForceRelease();
         mWiTalkFirebaseAuthentication.stopTracking();
+        super.onDestroy();
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
@@ -68,7 +69,6 @@ public class StartActivity extends AppCompatActivity implements IAsyncNotifiable
                     ConstantsClass.Usuario.setIpUsuario(ConstantsClass.IpExterno);
                     Intent intent = new Intent(StartActivity.this, ConnectActivity.class);
                     startActivity(intent);
-//                    finish();
                     break;
             }
         }catch (Exception ex){

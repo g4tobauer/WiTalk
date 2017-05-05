@@ -1,6 +1,5 @@
 package com.desenvolvigames.applications.witalk.fcm.authenticacion;
 
-import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
@@ -9,7 +8,6 @@ import com.desenvolvigames.applications.witalk.activities.StartActivity;
 import com.desenvolvigames.applications.witalk.entities.Usuario;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
-import com.facebook.login.LoginResult;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;

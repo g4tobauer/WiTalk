@@ -19,7 +19,7 @@ import java.util.List;
 
 public class Usuario extends EntityBase{
 
-    public static final String sincronize = "UserSincronize";
+    public static final String SINCRONIZE = "UserSincronize";
     private UserInfo mFirebaseUser;
     private UserInfo mFacebookUser;
     private Ip mIp;
@@ -33,6 +33,7 @@ public class Usuario extends EntityBase{
                 mFacebookUser = user;
             }
         }
+        mWiTalkFirebaseDatabaseManager = new WiTalkFirebaseDatabaseManager(this);
         Init();
     }
 
@@ -40,60 +41,43 @@ public class Usuario extends EntityBase{
         @Override
         protected String doInBackground(String... params) {
             String tag = params[0];
-            if (IsReleased()) {
-                switch (tag) {
-                    case sincronize:
-                        publishProgress();
-                        break;
-                }
+            if (!IsReleased()) {
+                tag = "false";
             }
             return tag;
         }
         @Override
         protected void onPostExecute(String tag) {
             super.onPostExecute(tag);
-            mAsyncNotifiable.ExecuteNotify(tag, Usuario.sincronize);
+            mAsyncNotifiable.ExecuteNotify(tag, Usuario.SINCRONIZE);
             if(load !=null)
                 load.dismiss();
             load = null;
         }
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            super.onProgressUpdate(values);
-            Log.i("onProgressUpdate", "Exibindo ProgressDialog na tela Thread: " + Thread.currentThread().getName());
-            if(load == null)
-                load = ProgressDialog.show(mAsyncNotifiable.GetContext(), "Por favor Aguarde ...","Sincronizando ...",true, false);
-            load.setMessage("Sincronizando ... ");
-        }
     }
 
-    private String getFirebaseInstanceMessageToken(){
-        return FirebaseInstanceId.getInstance().getToken();
-    }
+    private String getFirebaseInstanceMessageToken(){return FirebaseInstanceId.getInstance().getToken();}
 
     public void connect(){
-        mIp = new Ip();
-        mIp.Sincronize(this, Ip.sincronize);
+        if(mIp == null){
+            mIp = new Ip();
+        }else{
+            mIp.Init();
+        }
+        if(mIp.mIsReleased){
+            mIp.Sincronize(this);
+        }
     }
     public void setIpUsuario(String ipUsuario){
         GetRef().child("IpUsuario").setValue(ipUsuario);
     }
-    public String getAuthenticationId(){
-        return mFirebaseUser.getUid();
-    }
-    public String getIpUsuario(){
-        mIsReleased = false;
-        return mDataSnapshot.child("IpUsuario").getValue(String.class);
-    }
-    public String getUserMessageToken(){
-        mIsReleased = false;
-        return mDataSnapshot.child("UserMessageToken").getValue(String.class);
-    }
+    public String getNomeUsuario(){return mFirebaseUser.getDisplayName();}
+    public String getAuthenticationId(){return mFirebaseUser.getUid();}
+    public String getIpUsuario(){return mDataSnapshot.child("IpUsuario").getValue(String.class);}
+    public String getUserMessageToken(){return mDataSnapshot.child("UserMessageToken").getValue(String.class);}
 
     @Override
     protected void Init(){
-        mIsReleased = false;
-        mWiTalkFirebaseDatabaseManager = new WiTalkFirebaseDatabaseManager(this);
         DatabaseReference ref = GetRef();
         ref.child("FirebaseUid").setValue(mFirebaseUser.getUid());
         ref.child("FacebookUid").setValue(mFacebookUser.getUid());
@@ -103,17 +87,30 @@ public class Usuario extends EntityBase{
         ref.child("UserMessageToken").setValue(getFirebaseInstanceMessageToken());
     }
     @Override
-    public void Sincronize(IAsyncNotifiable asyncNotifiable, String tag){
+    public void Sincronize(IAsyncNotifiable asyncNotifiable){
+        mIsReleased = false;
         mAsyncNotifiable = asyncNotifiable;
-        new UsuarioAsyncTask().execute(tag);
+
+        if(mAsyncTask!=null){mAsyncTask.cancel(true);}
+        mAsyncTask = new UsuarioAsyncTask();
+        mAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, Usuario.SINCRONIZE);
     }
     @Override
     public void ExecuteNotify(String tag, String result) {
         switch (tag){
-            case Ip.sincronize:
-                Toast.makeText(mAsyncNotifiable.GetContext(), "Ip Sincronizado!", Toast.LENGTH_SHORT);
+            case Ip.SINCRONIZE:
+                Toast.makeText(mAsyncNotifiable.GetContext(), "Ip Sincronizado!", Toast.LENGTH_SHORT).show();
+                mIp.Sincronize(this);
+                break;
+            default:
                 break;
         }
+    }
+
+    @Override
+    public void ForceRelease() {
+        if(mIp!=null){mIp.ForceRelease();}
+        super.ForceRelease();
     }
     @Override
     public String GetRoot() {
