@@ -56,21 +56,21 @@ public class BaseActivity extends AppCompatActivity implements IParameterNotifia
     }
 
     @Override
-    public void ExecuteNotify(String tag, String result){
+    public void ExecuteNotify(String tag, Object result){
         switch (tag)
         {
             case ConstantsClass.GetIpUrl:
                 try
                 {
-                    PostIp((String)new JSONObject(result).get("ip"));
-                    Log.i("RespostaGet", result);
+                    PostIp((String)new JSONObject((String)result).get("ip"));
+                    Log.i("RespostaGet", (String)result);
                 }catch(Exception ex)
                 {
                     Log.i("RespostaGet", ex.getMessage());
                 }
                 break;
             case ConstantsClass.PostIpObjectUrl:
-                _tabIp = JsonObjetcManagement.ParseJsonObject(result, Tab_Ip.class);
+                _tabIp = JsonObjetcManagement.ParseJsonObject((String)result, Tab_Ip.class);
                 if(ConstantsClass.IpExterno.equals(_tabIp.getIp()))
                 {
                     _tabUsuario.fk_int_IdIp = _tabIp.getPkIP();
@@ -78,7 +78,7 @@ public class BaseActivity extends AppCompatActivity implements IParameterNotifia
                 }
                 break;
             case ConstantsClass.PostUsuarioObjectUrl:
-                _tabUsuario = JsonObjetcManagement.ParseJsonObject(result, Tab_Usuario.class);
+                _tabUsuario = JsonObjetcManagement.ParseJsonObject((String)result, Tab_Usuario.class);
                 _tabUsuario = null;
                 break;
         }

@@ -49,10 +49,10 @@ public abstract class EntityBase implements IDataBaseManageable, IAsyncNotifiabl
     }
 
     protected abstract void Init();
-    public abstract void Sincronize(IAsyncNotifiable asyncNotifiable);
+    public abstract void Sincronize(IAsyncNotifiable asyncNotifiable, String syncAction);
     public void ForceRelease(){
         mAsyncTask.cancel(true);
     }
     @Override
-    public void ExecuteNotify(String tag, String result) {}
+    public void ExecuteNotify(String tag, Object result) {}
 }

@@ -3,7 +3,7 @@ package com.desenvolvigames.applications.witalk.activities;
 import android.content.Intent;
 import android.os.Bundle;
 
-public class MainActivity extends StartActivity
+public class MainActivity extends AuthenticationActivity
 {
     @Override
     protected void onCreate(Bundle savedInstanceState){super.onCreate(savedInstanceState);}

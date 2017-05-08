@@ -1,8 +1,6 @@
 package com.desenvolvigames.applications.witalk.entities;
 
-import android.app.ProgressDialog;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.desenvolvigames.applications.witalk.fcm.database.WiTalkFirebaseDatabaseManager;
 import com.desenvolvigames.applications.witalk.interfaces.IAsyncNotifiable;
@@ -15,9 +13,9 @@ import com.google.firebase.database.DatabaseReference;
 
 public class Ip extends EntityBase {
 
-    private static final String IpNode = "IpNode";
-    private String mIp;
+    private static final String IPNODE = "IpNode";
     public static final String SINCRONIZE = "IpSincronize";
+    private String mIp;
 
     public Ip(){
         mIsReleased = true;
@@ -37,7 +35,7 @@ public class Ip extends EntityBase {
         }
         protected void onPostExecute(String tag) {
             super.onPostExecute(tag);
-            mAsyncNotifiable.ExecuteNotify(tag, Ip.SINCRONIZE);
+            mAsyncNotifiable.ExecuteNotify(tag, tag);
             if(load !=null)
                 load.dismiss();
             load = null;
@@ -51,16 +49,16 @@ public class Ip extends EntityBase {
         ref.child("UserMessageToken").setValue(ConstantsClass.Usuario.getUserMessageToken());
     }
     @Override
-    public void Sincronize(IAsyncNotifiable asyncNotifiable) {
+    public void Sincronize(IAsyncNotifiable asyncNotifiable, String syncAction) {
         mIsReleased = false;
         mAsyncNotifiable = asyncNotifiable;
 
         if(mAsyncTask!=null){mAsyncTask.cancel(true);}
         mAsyncTask = new IpAsyncTask();
-        mAsyncTask .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Ip.SINCRONIZE);
+        mAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, syncAction);
     }
     @Override
     public String GetRoot() {
-        return IpNode.concat("/").concat(mIp);
+        return IPNODE.concat("/").concat(mIp);
     }
 }

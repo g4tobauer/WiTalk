@@ -22,7 +22,7 @@ import com.facebook.login.widget.LoginButton;
 
 import org.json.JSONObject;
 
-public class StartActivity extends AppCompatActivity implements IAsyncNotifiable
+public class AuthenticationActivity extends AppCompatActivity implements IAsyncNotifiable
 {
     private WiTalkFirebaseAuthentication mWiTalkFirebaseAuthentication;
     private LoginButton mLoginButton;
@@ -32,7 +32,7 @@ public class StartActivity extends AppCompatActivity implements IAsyncNotifiable
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
-        setContentView(R.layout.activity_start);
+        setContentView(R.layout.activity_authentication);
         ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo mWifi = connManager.getActiveNetworkInfo();
         if (mWifi.isConnected()) {
@@ -61,13 +61,13 @@ public class StartActivity extends AppCompatActivity implements IAsyncNotifiable
         mCallbackManager.onActivityResult(requestCode,resultCode,data);
     }
     @Override
-    public void ExecuteNotify(String tag, String result) {
+    public void ExecuteNotify(String tag, Object result) {
         try {
             switch (tag) {
                 case ConstantsClass.GetIpUrl:
-                    ConstantsClass.IpExterno = new JSONObject(result).getString("ip");
+                    ConstantsClass.IpExterno = new JSONObject((String)result).getString("ip");
                     ConstantsClass.Usuario.setIpUsuario(ConstantsClass.IpExterno);
-                    Intent intent = new Intent(StartActivity.this, ConnectActivity.class);
+                    Intent intent = new Intent(AuthenticationActivity.this, ConnectActivity.class);
                     startActivity(intent);
                     break;
             }
@@ -100,7 +100,7 @@ public class StartActivity extends AppCompatActivity implements IAsyncNotifiable
     public void beginProgram(){
         ConstantsClass.Usuario = mWiTalkFirebaseAuthentication.getUsuario();
         ConstantsClass.IpExterno = "";
-        GetAsyncTask task = new GetAsyncTask(StartActivity.this);
+        GetAsyncTask task = new GetAsyncTask(AuthenticationActivity.this);
         task.execute(ConstantsClass.GetIpUrl);
     }
 }

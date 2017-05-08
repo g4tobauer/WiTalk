@@ -49,7 +49,7 @@ public class Usuario extends EntityBase{
         @Override
         protected void onPostExecute(String tag) {
             super.onPostExecute(tag);
-            mAsyncNotifiable.ExecuteNotify(tag, Usuario.SINCRONIZE);
+            mAsyncNotifiable.ExecuteNotify(tag, tag);
             if(load !=null)
                 load.dismiss();
             load = null;
@@ -65,7 +65,7 @@ public class Usuario extends EntityBase{
             mIp.Init();
         }
         if(mIp.mIsReleased){
-            mIp.Sincronize(this);
+            mIp.Sincronize(this, mIpSyncAction);
         }
     }
     public void setIpUsuario(String ipUsuario){
@@ -87,20 +87,27 @@ public class Usuario extends EntityBase{
         ref.child("UserMessageToken").setValue(getFirebaseInstanceMessageToken());
     }
     @Override
-    public void Sincronize(IAsyncNotifiable asyncNotifiable){
+    public void Sincronize(IAsyncNotifiable asyncNotifiable, String syncAction){
         mIsReleased = false;
         mAsyncNotifiable = asyncNotifiable;
-
-        if(mAsyncTask!=null){mAsyncTask.cancel(true);}
-        mAsyncTask = new UsuarioAsyncTask();
-        mAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, Usuario.SINCRONIZE);
+        if (mAsyncTask != null) {
+            mAsyncTask.cancel(true);
+        }
+        if(syncAction.equals(mLobbySyncAction)){
+            mIp.Sincronize(this, syncAction);
+        }else {
+            mAsyncTask = new UsuarioAsyncTask();
+            mAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, syncAction);
+        }
     }
     @Override
-    public void ExecuteNotify(String tag, String result) {
+    public void ExecuteNotify(String tag, Object result) {
         switch (tag){
             case Ip.SINCRONIZE:
                 Toast.makeText(mAsyncNotifiable.GetContext(), "Ip Sincronizado!", Toast.LENGTH_SHORT).show();
-                mIp.Sincronize(this);
+                break;
+            case mLobbySyncAction:
+                mAsyncNotifiable.ExecuteNotify(mLobbySyncAction, result);
                 break;
             default:
                 break;

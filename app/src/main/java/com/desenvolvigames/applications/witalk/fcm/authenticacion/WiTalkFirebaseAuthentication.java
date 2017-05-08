@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.desenvolvigames.applications.witalk.activities.StartActivity;
+import com.desenvolvigames.applications.witalk.activities.AuthenticationActivity;
 import com.desenvolvigames.applications.witalk.entities.Usuario;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
@@ -25,11 +25,11 @@ public class WiTalkFirebaseAuthentication
     private AccessTokenTracker mAccessTokenTracker;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseAuth mAuth;
-    private StartActivity mStartActivity;
+    private AuthenticationActivity mAuthenticationActivity;
     private Usuario mUsuario;
 
-    public WiTalkFirebaseAuthentication(StartActivity startActivity){
-        mStartActivity = startActivity;
+    public WiTalkFirebaseAuthentication(AuthenticationActivity authenticationActivity){
+        mAuthenticationActivity = authenticationActivity;
         InitAuthentication();
     }
 
@@ -42,7 +42,7 @@ public class WiTalkFirebaseAuthentication
                 if (user != null){
                     if(mUsuario == null){
                         mUsuario = new Usuario(user.getProviderData());
-                        mStartActivity.beginProgram();
+                        mAuthenticationActivity.beginProgram();
                     }
                 }
                 else{
@@ -74,13 +74,13 @@ public class WiTalkFirebaseAuthentication
         Log.d("TAG", "handleFacebookAccessToken:" + token);
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
         mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(mStartActivity, new OnCompleteListener<AuthResult>(){
+                .addOnCompleteListener(mAuthenticationActivity, new OnCompleteListener<AuthResult>(){
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task){
                         Log.d("TAG", "signInWithCredential:onComplete:" + task.isSuccessful());
                         if (!task.isSuccessful()){
                             Log.w("TAG", "signInWithCredential", task.getException());
-                            Toast.makeText(mStartActivity, "Authentication failed.",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mAuthenticationActivity, "Authentication failed.",Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

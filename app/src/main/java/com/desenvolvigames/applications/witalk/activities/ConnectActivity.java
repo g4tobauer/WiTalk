@@ -1,6 +1,7 @@
 package com.desenvolvigames.applications.witalk.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -35,24 +36,27 @@ public class ConnectActivity extends AppCompatActivity implements IAsyncNotifiab
             @Override
             public void onClick(View v) {
                 ConstantsClass.Usuario.connect();
+                Intent intent = new Intent(ConnectActivity.this, LobbyActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
     }
     private void sincronize(){
-        ConstantsClass.Usuario.Sincronize(ConnectActivity.this);
+        ConstantsClass.Usuario.Sincronize(ConnectActivity.this, mUserSyncAction);
     }
 
     @Override
     public Context GetContext() {
         return this;
     }
+
     @Override
-    public void ExecuteNotify(String tag, String result) {
+    public void ExecuteNotify(String tag, Object result) {
         switch (tag){
             case Usuario.SINCRONIZE:
                 if(Usuario.SINCRONIZE.equals(result)){
                     Toast.makeText(ConnectActivity.this, "Usuario Sincronizado!", Toast.LENGTH_SHORT).show();
-                    ConstantsClass.Usuario.Sincronize(ConnectActivity.this);
                 }
                 break;
             default:

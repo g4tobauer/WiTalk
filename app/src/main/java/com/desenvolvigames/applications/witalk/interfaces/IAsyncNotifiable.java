@@ -2,6 +2,9 @@ package com.desenvolvigames.applications.witalk.interfaces;
 
 import android.content.Context;
 
+import com.desenvolvigames.applications.witalk.entities.Ip;
+import com.desenvolvigames.applications.witalk.entities.Usuario;
+
 import org.json.JSONObject;
 
 /**
@@ -10,6 +13,10 @@ import org.json.JSONObject;
 
 public interface IAsyncNotifiable
 {
+    String mUserSyncAction = Usuario.SINCRONIZE;
+    String mIpSyncAction = Ip.SINCRONIZE;
+    String mLobbySyncAction = "LobbySyncAction";
+
     Context GetContext();
-    void ExecuteNotify(String tag, String result);
+    void ExecuteNotify(String tag, Object result);
 }
