@@ -18,11 +18,9 @@ import android.widget.Toast;
 
 import com.desenvolvigames.applications.witalk.R;
 import com.desenvolvigames.applications.witalk.entities.Contact;
-import com.desenvolvigames.applications.witalk.entities.Usuario;
 import com.desenvolvigames.applications.witalk.interfaces.IAsyncNotifiable;
 import com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass;
 
-import java.lang.reflect.Array;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +58,7 @@ public class LobbyActivity extends AppCompatActivity implements IAsyncNotifiable
     }
 
     private void sincronize(){
-        ConstantsClass.Usuario.Sincronize(LobbyActivity.this, mLobbySyncAction);
+        ConstantsClass.Usuario.Sincronize(LobbyActivity.this, null);
     }
     @Override
     public Context GetContext() {
@@ -68,13 +66,8 @@ public class LobbyActivity extends AppCompatActivity implements IAsyncNotifiable
     }
     @Override
     public void ExecuteNotify(String tag, Object result) {
-        switch (tag){
-            case mLobbySyncAction:
-                sincronize();
-                break;
-            default:
-                break;
-        }
+        Toast.makeText(LobbyActivity.this, tag+" Sincronizado!", Toast.LENGTH_SHORT).show();
+        sincronize();
     }
 
     private class ContactsListAdapter extends BaseAdapter {

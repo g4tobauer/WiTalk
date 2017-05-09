@@ -23,10 +23,10 @@ public class Ip extends EntityBase {
         Init();
     }
 
-    private class IpAsyncTask extends AsyncTask<String, Void, String> {
+    private class IpAsyncTask extends AsyncTask<Void, Void, String> {
         @Override
-        protected String doInBackground(String... params) {
-            String tag = params[0];
+        protected String doInBackground(Void... params) {
+            String tag = null;
             if (!IsReleased()) {
                 tag = "false";
             }
@@ -34,7 +34,7 @@ public class Ip extends EntityBase {
         }
         protected void onPostExecute(String tag) {
             super.onPostExecute(tag);
-            mAsyncNotifiable.ExecuteNotify(tag, tag);
+            mAsyncNotifiable.ExecuteNotify(Ip.this.getClass().getSimpleName(), Ip.this);
             if(load !=null)
                 load.dismiss();
             load = null;
@@ -51,10 +51,9 @@ public class Ip extends EntityBase {
     public void Sincronize(IAsyncNotifiable asyncNotifiable, String syncAction) {
         mIsReleased = false;
         mAsyncNotifiable = asyncNotifiable;
-
         if(mAsyncTask!=null){mAsyncTask.cancel(true);}
         mAsyncTask = new IpAsyncTask();
-        mAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, syncAction);
+        mAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
     @Override
     public String GetRoot() {

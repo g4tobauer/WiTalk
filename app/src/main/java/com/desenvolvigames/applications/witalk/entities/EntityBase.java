@@ -18,7 +18,7 @@ import com.google.firebase.database.DatabaseReference;
 public abstract class EntityBase implements IDataBaseManageable, IAsyncNotifiable {
 
     protected boolean mIsReleased;
-    protected AsyncTask<String, Void, String> mAsyncTask;
+    protected AsyncTask<Void, Void, String> mAsyncTask;
     protected ProgressDialog load;
     protected IAsyncNotifiable mAsyncNotifiable;
     protected DataSnapshot mDataSnapshot;

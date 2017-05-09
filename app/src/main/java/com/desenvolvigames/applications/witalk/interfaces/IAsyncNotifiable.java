@@ -13,10 +13,6 @@ import org.json.JSONObject;
 
 public interface IAsyncNotifiable
 {
-    String mUserSyncAction = "UserSincronize";
-    String mIpSyncAction = "IpSincronize";
-    String mLobbySyncAction = "LobbySyncAction";
-
     Context GetContext();
     void ExecuteNotify(String tag, Object result);
 }

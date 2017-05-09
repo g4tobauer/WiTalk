@@ -34,10 +34,10 @@ public class Usuario extends EntityBase{
         Init();
     }
 
-    private class UsuarioAsyncTask extends AsyncTask<String, Void, String> {
+    private class UsuarioAsyncTask extends AsyncTask<Void, Void, String> {
         @Override
-        protected String doInBackground(String... params) {
-            String tag = params[0];
+        protected String doInBackground(Void... params) {
+            String tag = null;
             if (!IsReleased()) {
                 tag = "false";
             }
@@ -46,7 +46,7 @@ public class Usuario extends EntityBase{
         @Override
         protected void onPostExecute(String tag) {
             super.onPostExecute(tag);
-            mAsyncNotifiable.ExecuteNotify(tag, tag);
+            mAsyncNotifiable.ExecuteNotify(Usuario.this.getClass().getSimpleName(), Usuario.this);
             if(load !=null)
                 load.dismiss();
             load = null;
@@ -62,7 +62,7 @@ public class Usuario extends EntityBase{
             mIp.Init();
         }
         if(mIp.mIsReleased){
-            mIp.Sincronize(this, mIpSyncAction);
+            mIp.Sincronize(this, null);
         }
     }
     public void setIpUsuario(String ipUsuario){
@@ -87,28 +87,17 @@ public class Usuario extends EntityBase{
     public void Sincronize(IAsyncNotifiable asyncNotifiable, String syncAction){
         mIsReleased = false;
         mAsyncNotifiable = asyncNotifiable;
-        if (mAsyncTask != null) {
-            mAsyncTask.cancel(true);
-        }
-        if(syncAction.equals(mLobbySyncAction)){
-            mIp.Sincronize(this, syncAction);
-        }else {
-            mAsyncTask = new UsuarioAsyncTask();
-            mAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, syncAction);
-        }
+
+        if(mAsyncTask!=null){mAsyncTask.cancel(true);}
+
+        mAsyncTask = new UsuarioAsyncTask();
+        mAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+        if(mIp!=null){mIp.Sincronize(this, null);}
     }
     @Override
     public void ExecuteNotify(String tag, Object result) {
-        switch (tag){
-            case mIpSyncAction:
-                Toast.makeText(mAsyncNotifiable.GetContext(), "Ip Sincronizado!", Toast.LENGTH_SHORT).show();
-                break;
-            case mLobbySyncAction:
-                mAsyncNotifiable.ExecuteNotify(mLobbySyncAction, result);
-                break;
-            default:
-                break;
-        }
+        mAsyncNotifiable.ExecuteNotify(tag, result);
     }
 
     @Override
