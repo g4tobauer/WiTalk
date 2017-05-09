@@ -54,8 +54,8 @@ public class ConnectActivity extends AppCompatActivity implements IAsyncNotifiab
     @Override
     public void ExecuteNotify(String tag, Object result) {
         switch (tag){
-            case Usuario.SINCRONIZE:
-                if(Usuario.SINCRONIZE.equals(result)){
+            case mUserSyncAction:
+                if(mUserSyncAction.equals(result)){
                     Toast.makeText(ConnectActivity.this, "Usuario Sincronizado!", Toast.LENGTH_SHORT).show();
                 }
                 break;

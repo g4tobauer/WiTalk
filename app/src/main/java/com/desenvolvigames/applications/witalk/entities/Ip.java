@@ -14,7 +14,6 @@ import com.google.firebase.database.DatabaseReference;
 public class Ip extends EntityBase {
 
     private static final String IPNODE = "IpNode";
-    public static final String SINCRONIZE = "IpSincronize";
     private String mIp;
 
     public Ip(){

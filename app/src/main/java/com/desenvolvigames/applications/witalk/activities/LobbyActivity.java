@@ -44,9 +44,6 @@ public class LobbyActivity extends AppCompatActivity implements IAsyncNotifiable
         mUiListLobby = (ListView)findViewById(R.id.mUiListLobby);
         setAdapter();
     }
-    private void initEvents(){
-        mUiListLobby.setOnItemClickListener(this);
-    }
     private void setAdapter(){
         if(mContactsAdapter==null) {
             mContactsAdapter = new ContactsListAdapter(this, mLstContacts);
@@ -54,11 +51,14 @@ public class LobbyActivity extends AppCompatActivity implements IAsyncNotifiable
         }
         mContactsAdapter.notifyDataSetChanged();
     }
-
+    private void initEvents(){
+        mUiListLobby.setOnItemClickListener(this);
+    }
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Toast.makeText(LobbyActivity.this, String.valueOf(position), Toast.LENGTH_SHORT).show();
     }
+
     private void sincronize(){
         ConstantsClass.Usuario.Sincronize(LobbyActivity.this, mLobbySyncAction);
     }
@@ -70,7 +70,7 @@ public class LobbyActivity extends AppCompatActivity implements IAsyncNotifiable
     public void ExecuteNotify(String tag, Object result) {
         switch (tag){
             case mLobbySyncAction:
-                ConstantsClass.Usuario.Sincronize(LobbyActivity.this, mLobbySyncAction);
+                sincronize();
                 break;
             default:
                 break;

@@ -1,8 +1,6 @@
 package com.desenvolvigames.applications.witalk.entities;
 
-import android.app.ProgressDialog;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.desenvolvigames.applications.witalk.fcm.database.WiTalkFirebaseDatabaseManager;
@@ -19,7 +17,6 @@ import java.util.List;
 
 public class Usuario extends EntityBase{
 
-    public static final String SINCRONIZE = "UserSincronize";
     private UserInfo mFirebaseUser;
     private UserInfo mFacebookUser;
     private Ip mIp;
@@ -103,7 +100,7 @@ public class Usuario extends EntityBase{
     @Override
     public void ExecuteNotify(String tag, Object result) {
         switch (tag){
-            case Ip.SINCRONIZE:
+            case mIpSyncAction:
                 Toast.makeText(mAsyncNotifiable.GetContext(), "Ip Sincronizado!", Toast.LENGTH_SHORT).show();
                 break;
             case mLobbySyncAction:
