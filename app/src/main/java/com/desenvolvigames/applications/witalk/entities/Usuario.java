@@ -5,6 +5,7 @@ import android.widget.Toast;
 
 import com.desenvolvigames.applications.witalk.fcm.database.WiTalkFirebaseDatabaseManager;
 import com.desenvolvigames.applications.witalk.interfaces.IAsyncNotifiable;
+import com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass;
 import com.google.firebase.auth.UserInfo;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -30,27 +31,9 @@ public class Usuario extends EntityBase{
                 mFacebookUser = user;
             }
         }
-        mWiTalkFirebaseDatabaseManager = new WiTalkFirebaseDatabaseManager(this);
+        if(mWiTalkFirebaseDatabaseManager == null)
+            mWiTalkFirebaseDatabaseManager = new WiTalkFirebaseDatabaseManager(this);
         Init();
-    }
-
-    private class UsuarioAsyncTask extends AsyncTask<Void, Void, String> {
-        @Override
-        protected String doInBackground(Void... params) {
-            String tag = null;
-            if (!IsReleased()) {
-                tag = "false";
-            }
-            return tag;
-        }
-        @Override
-        protected void onPostExecute(String tag) {
-            super.onPostExecute(tag);
-            mAsyncNotifiable.ExecuteNotify(Usuario.this.getClass().getSimpleName(), Usuario.this);
-            if(load !=null)
-                load.dismiss();
-            load = null;
-        }
     }
 
     private String getFirebaseInstanceMessageToken(){return FirebaseInstanceId.getInstance().getToken();}
@@ -61,9 +44,7 @@ public class Usuario extends EntityBase{
         }else{
             mIp.Init();
         }
-        if(mIp.mIsReleased){
-            mIp.Sincronize(this, null);
-        }
+        mIp.Sincronize(this);
     }
     public void setIpUsuario(String ipUsuario){
         GetRef().child("IpUsuario").setValue(ipUsuario);
@@ -73,6 +54,12 @@ public class Usuario extends EntityBase{
     public String getIpUsuario(){return mDataSnapshot.child("IpUsuario").getValue(String.class);}
     public String getUserMessageToken(){return mDataSnapshot.child("UserMessageToken").getValue(String.class);}
 
+
+    @Override
+    protected void UpdateSnapshot(){
+        if(mAsyncNotifiable!=null)
+            mAsyncNotifiable.ExecuteNotify(Usuario.this.getClass().getSimpleName(), Usuario.this);
+    }
     @Override
     protected void Init(){
         DatabaseReference ref = GetRef();
@@ -84,26 +71,13 @@ public class Usuario extends EntityBase{
         ref.child("UserMessageToken").setValue(getFirebaseInstanceMessageToken());
     }
     @Override
-    public void Sincronize(IAsyncNotifiable asyncNotifiable, String syncAction){
-        mIsReleased = false;
+    public void Sincronize(IAsyncNotifiable asyncNotifiable){
         mAsyncNotifiable = asyncNotifiable;
-
-        if(mAsyncTask!=null){mAsyncTask.cancel(true);}
-
-        mAsyncTask = new UsuarioAsyncTask();
-        mAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-
-        if(mIp!=null){mIp.Sincronize(this, null);}
+        if(mIp!=null){mIp.Sincronize(mAsyncNotifiable);}
     }
     @Override
     public void ExecuteNotify(String tag, Object result) {
         mAsyncNotifiable.ExecuteNotify(tag, result);
-    }
-
-    @Override
-    public void ForceRelease() {
-        if(mIp!=null){mIp.ForceRelease();}
-        super.ForceRelease();
     }
     @Override
     public String GetRoot() {

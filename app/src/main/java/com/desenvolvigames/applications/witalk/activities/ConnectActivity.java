@@ -35,7 +35,6 @@ public class ConnectActivity extends AppCompatActivity implements IAsyncNotifiab
         btnConnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ConstantsClass.Usuario.connect();
                 Intent intent = new Intent(ConnectActivity.this, LobbyActivity.class);
                 startActivity(intent);
                 finish();
@@ -43,7 +42,7 @@ public class ConnectActivity extends AppCompatActivity implements IAsyncNotifiab
         });
     }
     private void sincronize(){
-        ConstantsClass.Usuario.Sincronize(ConnectActivity.this, null);
+        ConstantsClass.Usuario.Sincronize(ConnectActivity.this);
     }
 
     @Override
@@ -54,6 +53,5 @@ public class ConnectActivity extends AppCompatActivity implements IAsyncNotifiab
     @Override
     public void ExecuteNotify(String tag, Object result) {
         Toast.makeText(ConnectActivity.this, tag+" Sincronizado!", Toast.LENGTH_SHORT).show();
-        sincronize();
     }
 }

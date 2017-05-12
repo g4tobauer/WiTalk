@@ -52,7 +52,6 @@ public class AuthenticationActivity extends AppCompatActivity implements IAsyncN
     }
     @Override
     protected void onDestroy(){
-        ConstantsClass.Usuario.ForceRelease();
         mWiTalkFirebaseAuthentication.stopTracking();
         super.onDestroy();
     }
@@ -65,7 +64,7 @@ public class AuthenticationActivity extends AppCompatActivity implements IAsyncN
         try {
             switch (tag) {
                 case ConstantsClass.GetIpUrl:
-                    ConstantsClass.IpExterno = new JSONObject((String)result).getString("ip");
+                    ConstantsClass.IpExterno = new JSONObject((String)result).getString("ip").replace(".","x");
                     ConstantsClass.Usuario.setIpUsuario(ConstantsClass.IpExterno);
                     Intent intent = new Intent(AuthenticationActivity.this, ConnectActivity.class);
                     startActivity(intent);
@@ -98,7 +97,8 @@ public class AuthenticationActivity extends AppCompatActivity implements IAsyncN
         });
     }
     public void beginProgram(){
-        ConstantsClass.Usuario = mWiTalkFirebaseAuthentication.getUsuario();
+        if(ConstantsClass.Usuario == null)
+            ConstantsClass.Usuario = mWiTalkFirebaseAuthentication.getUsuario();
         ConstantsClass.IpExterno = "";
         GetAsyncTask task = new GetAsyncTask(AuthenticationActivity.this);
         task.execute(ConstantsClass.GetIpUrl);

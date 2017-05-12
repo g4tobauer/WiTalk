@@ -11,36 +11,22 @@ import com.google.firebase.database.DatabaseReference;
  * Created by Joao on 01/05/2017.
  */
 
-public class Ip extends EntityBase {
+public class Ip extends EntityBase{
 
     private static final String IPNODE = "IpNode";
     private String mIp;
 
     public Ip(){
-        mIsReleased = true;
-        mIp = ConstantsClass.Usuario.getIpUsuario().replace(".","");
-        mWiTalkFirebaseDatabaseManager = new WiTalkFirebaseDatabaseManager(this);
+        mIp = ConstantsClass.Usuario.getIpUsuario();
+        if(mWiTalkFirebaseDatabaseManager == null)
+            mWiTalkFirebaseDatabaseManager = new WiTalkFirebaseDatabaseManager(this);
         Init();
     }
-
-    private class IpAsyncTask extends AsyncTask<Void, Void, String> {
-        @Override
-        protected String doInBackground(Void... params) {
-            String tag = null;
-            if (!IsReleased()) {
-                tag = "false";
-            }
-            return tag;
-        }
-        protected void onPostExecute(String tag) {
-            super.onPostExecute(tag);
+    @Override
+    protected void UpdateSnapshot(){
+        if(mAsyncNotifiable!=null)
             mAsyncNotifiable.ExecuteNotify(Ip.this.getClass().getSimpleName(), Ip.this);
-            if(load !=null)
-                load.dismiss();
-            load = null;
-        }
     }
-
     @Override
     protected void Init(){
         DatabaseReference ref = GetRef().child(ConstantsClass.Usuario.getAuthenticationId());
@@ -48,12 +34,8 @@ public class Ip extends EntityBase {
         ref.child("UserMessageToken").setValue(ConstantsClass.Usuario.getUserMessageToken());
     }
     @Override
-    public void Sincronize(IAsyncNotifiable asyncNotifiable, String syncAction) {
-        mIsReleased = false;
+    public void Sincronize(IAsyncNotifiable asyncNotifiable) {
         mAsyncNotifiable = asyncNotifiable;
-        if(mAsyncTask!=null){mAsyncTask.cancel(true);}
-        mAsyncTask = new IpAsyncTask();
-        mAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
     @Override
     public String GetRoot() {

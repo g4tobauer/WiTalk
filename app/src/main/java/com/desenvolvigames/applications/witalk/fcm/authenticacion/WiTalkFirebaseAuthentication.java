@@ -6,6 +6,7 @@ import android.widget.Toast;
 
 import com.desenvolvigames.applications.witalk.activities.AuthenticationActivity;
 import com.desenvolvigames.applications.witalk.entities.Usuario;
+import com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -54,8 +55,10 @@ public class WiTalkFirebaseAuthentication
             @Override
             protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken){
                 if (currentAccessToken == null){
-                    if(FirebaseAuth.getInstance().getCurrentUser() != null)
+                    if(FirebaseAuth.getInstance().getCurrentUser() != null) {
                         FirebaseAuth.getInstance().signOut();
+                        ConstantsClass.Usuario = null;
+                    }
                 }
             }
         };

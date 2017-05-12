@@ -17,41 +17,28 @@ import com.google.firebase.database.DatabaseReference;
 
 public abstract class EntityBase implements IDataBaseManageable, IAsyncNotifiable {
 
-    protected boolean mIsReleased;
-    protected AsyncTask<Void, Void, String> mAsyncTask;
-    protected ProgressDialog load;
     protected IAsyncNotifiable mAsyncNotifiable;
     protected DataSnapshot mDataSnapshot;
     protected WiTalkFirebaseDatabaseManager mWiTalkFirebaseDatabaseManager;
 
     @Override
     public void DataSnapshotUpdate(DataSnapshot dataSnapshot){
-        mIsReleased = true;
         mDataSnapshot = dataSnapshot;
+        UpdateSnapshot();
     }
     @Override
     public Context GetContext() {
         return mAsyncNotifiable.GetContext();
-    }
-
-    protected boolean IsReleased(){
-        while (!mIsReleased && !mAsyncTask.isCancelled()) {
-            try {
-                Thread.sleep(3000);
-            } catch (Exception ex) {
-                Log.w("Exception: ", ex);
-            }
-        }
-        return mIsReleased;
     }
     protected DatabaseReference GetRef(){
         return mWiTalkFirebaseDatabaseManager.getRef();
     }
 
     protected abstract void Init();
-    public abstract void Sincronize(IAsyncNotifiable asyncNotifiable, String syncAction);
-    public void ForceRelease(){
-        mAsyncTask.cancel(true);
+    protected abstract void UpdateSnapshot();
+    public abstract void Sincronize(IAsyncNotifiable asyncNotifiable);
+    public DataSnapshot GetDataSnapshot(){
+        return mDataSnapshot;
     }
     @Override
     public void ExecuteNotify(String tag, Object result) {}
