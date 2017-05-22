@@ -5,7 +5,10 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.Map;
 
 /**
  * Created by Joao on 29/04/2017.
@@ -32,6 +35,7 @@ public class WiTalkFirebaseDatabaseManager
             public void onCancelled(DatabaseError databaseError){}
         });
     }
+    public Map<String, String> getTime(){return ServerValue.TIMESTAMP;}
     public DatabaseReference getRef(){
         return mConditionRef;
     }

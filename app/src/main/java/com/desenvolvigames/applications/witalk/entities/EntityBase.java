@@ -36,10 +36,18 @@ public abstract class EntityBase implements IDataBaseManageable, IAsyncNotifiabl
 
     protected abstract void Init();
     protected abstract void UpdateSnapshot();
-    public abstract void Sincronize(IAsyncNotifiable asyncNotifiable);
-    public DataSnapshot GetDataSnapshot(){
+    protected abstract DatabaseReference GetIpLobbyReference();
+    protected DataSnapshot GetDataSnapshot(){
         return mDataSnapshot;
     }
+    protected void SyncTime(DatabaseReference ref){
+        if(ref == null)
+            GetRef().child("SyncTime").setValue(mWiTalkFirebaseDatabaseManager.getTime());
+        else
+            ref.child("SyncTime").setValue(mWiTalkFirebaseDatabaseManager.getTime());
+    }
+
+    public abstract void Sincronize(IAsyncNotifiable asyncNotifiable);
     @Override
     public void ExecuteNotify(String tag, Object result) {}
 }

@@ -18,6 +18,8 @@ import com.desenvolvigames.applications.witalk.entities.Ip;
 import com.desenvolvigames.applications.witalk.interfaces.IAsyncNotifiable;
 import com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +61,7 @@ public class LobbyActivity extends AppCompatActivity implements IAsyncNotifiable
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        setAdapter();
+//        setAdapter();
     }
     @Override
     public Context GetContext() {
@@ -72,23 +74,17 @@ public class LobbyActivity extends AppCompatActivity implements IAsyncNotifiable
                 result = null;
                 break;
             case "Ip":
-                ArrayList<Contact> lst = new ArrayList<>();
-                lst.clear();
-                for(DataSnapshot data : ((Ip)result).GetDataSnapshot().getChildren()){
-                    Contact contact = new Contact();
-                    contact.mNome = String.valueOf(data.child("Nome").getValue());
-                    contact.mUserMessageToken = String.valueOf(data.child("UserMessageToken").getValue());
-                    lst.add(contact);
-                }
+                List<Contact> lst = ConstantsClass.Usuario.getLobbyList();
                 mContactList.clear();
-                mContactList.addAll(lst);
+                if(lst != null) {
+                    mContactList.addAll(lst);
+                }
                 setAdapter();
                 break;
             default:
                 result = null;
                 break;
         }
-        sincronize();
     }
 
     private class ContactsListAdapter extends BaseAdapter {

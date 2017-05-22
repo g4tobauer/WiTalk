@@ -11,6 +11,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Joao on 28/04/2017.
@@ -36,29 +37,14 @@ public class Usuario extends EntityBase{
         Init();
     }
 
-    private String getFirebaseInstanceMessageToken(){return FirebaseInstanceId.getInstance().getToken();}
-
-    public void connect(){
-        if(mIp == null){
-            mIp = new Ip();
-        }else{
-            mIp.Init();
-        }
-        mIp.Sincronize(this);
-    }
-    public void setIpUsuario(String ipUsuario){
-        GetRef().child("IpUsuario").setValue(ipUsuario);
-    }
-    public String getNomeUsuario(){return mFirebaseUser.getDisplayName();}
-    public String getAuthenticationId(){return mFirebaseUser.getUid();}
-    public String getIpUsuario(){return mDataSnapshot.child("IpUsuario").getValue(String.class);}
-    public String getUserMessageToken(){return mDataSnapshot.child("UserMessageToken").getValue(String.class);}
-
-
     @Override
     protected void UpdateSnapshot(){
         if(mAsyncNotifiable!=null)
             mAsyncNotifiable.ExecuteNotify(Usuario.this.getClass().getSimpleName(), Usuario.this);
+    }
+    @Override
+    public DatabaseReference GetIpLobbyReference() {
+        return mIp.GetIpLobbyReference();
     }
     @Override
     protected void Init(){
@@ -77,10 +63,30 @@ public class Usuario extends EntityBase{
     }
     @Override
     public void ExecuteNotify(String tag, Object result) {
-        mAsyncNotifiable.ExecuteNotify(tag, result);
+        mIp = ((Ip)result);
+        mAsyncNotifiable.ExecuteNotify(tag, Usuario.this);
     }
     @Override
     public String GetRoot() {
         return this.getClass().getSimpleName().concat("/").concat(mFirebaseUser.getUid());
     }
+
+    public void connect(){
+        if(mIp == null){
+            mIp = new Ip();
+        }else{
+            SyncTime(null);
+            mIp.Init();
+        }
+        Sincronize(mAsyncNotifiable);
+    }
+    public void setIpUsuario(String ipUsuario){GetRef().child("IpUsuario").setValue(ipUsuario);}
+    public List<Contact> getLobbyList(){
+        return mIp.getLobbyList();
+    }
+    private String getFirebaseInstanceMessageToken(){return FirebaseInstanceId.getInstance().getToken();}
+    protected String getNomeUsuario(){return mFirebaseUser.getDisplayName();}
+    protected String getAuthenticationId(){return mFirebaseUser.getUid();}
+    protected String getIpUsuario(){return mDataSnapshot.child("IpUsuario").getValue(String.class);}
+    protected String getUserMessageToken(){return mDataSnapshot.child("UserMessageToken").getValue(String.class);}
 }

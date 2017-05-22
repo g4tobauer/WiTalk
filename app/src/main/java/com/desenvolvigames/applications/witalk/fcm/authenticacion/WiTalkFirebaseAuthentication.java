@@ -36,6 +36,9 @@ public class WiTalkFirebaseAuthentication
 
     private void InitAuthentication(){
         mAuth = FirebaseAuth.getInstance();
+        initListeners();
+    }
+    private void initListeners(){
         mAuthListener = new FirebaseAuth.AuthStateListener(){
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth){
@@ -73,20 +76,21 @@ public class WiTalkFirebaseAuthentication
     public void stopTracking(){
         mAccessTokenTracker.stopTracking();
     }
+
     public void handleFacebookAccessToken(AccessToken token){
         Log.d("TAG", "handleFacebookAccessToken:" + token);
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(mAuthenticationActivity, new OnCompleteListener<AuthResult>(){
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task){
-                        Log.d("TAG", "signInWithCredential:onComplete:" + task.isSuccessful());
-                        if (!task.isSuccessful()){
-                            Log.w("TAG", "signInWithCredential", task.getException());
-                            Toast.makeText(mAuthenticationActivity, "Authentication failed.",Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+        mAuth.signInWithCredential(credential).addOnCompleteListener(mAuthenticationActivity,
+        new OnCompleteListener<AuthResult>(){
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task){
+                Log.d("TAG", "signInWithCredential:onComplete:" + task.isSuccessful());
+                if (!task.isSuccessful()){
+                    Log.w("TAG", "signInWithCredential", task.getException());
+                    Toast.makeText(mAuthenticationActivity, "Authentication failed.",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
     public Usuario getUsuario(){
         return mUsuario;

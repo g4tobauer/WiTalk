@@ -2,10 +2,13 @@ package com.desenvolvigames.applications.witalk.utilities.connection;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.net.SSLCertificateSocketFactory;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.desenvolvigames.applications.witalk.interfaces.IAsyncNotifiable;
+
+import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -13,6 +16,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import javax.net.ssl.HttpsURLConnection;
 
 /**
  * Created by Joao on 16/04/2017.
@@ -45,10 +50,11 @@ public class GetAsyncTask extends AsyncTask<String,String,String>
     @Override
     protected String doInBackground(String... params){
         StringBuilder result = new StringBuilder();
-        HttpURLConnection urlConnection = null;
+        HttpsURLConnection urlConnection = null;
         try{
             url = new URL(params[0]);
-            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection = (HttpsURLConnection) url.openConnection();
+            urlConnection.setSSLSocketFactory(SSLCertificateSocketFactory.getInsecure(0, null));
             InputStream in = new BufferedInputStream(urlConnection.getInputStream());
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             String line;
@@ -57,6 +63,7 @@ public class GetAsyncTask extends AsyncTask<String,String,String>
                 result.append(line);
             }
         }catch(Exception ex){
+            Log.w("GetAsyncTask", ex);
             ex.printStackTrace();
         }
         finally{
