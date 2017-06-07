@@ -31,34 +31,41 @@ public class WiTalkFirebaseAuthentication
 
     public WiTalkFirebaseAuthentication(AuthenticationActivity authenticationActivity){
         mAuthenticationActivity = authenticationActivity;
-        InitAuthentication();
+        onInitAuthentication();
     }
 
-    private void InitAuthentication(){
+    private void onInitAuthentication(){
         mAuth = FirebaseAuth.getInstance();
-        initListeners();
+        onInitListeners();
     }
-    private void initListeners(){
+    private void onInitListeners(){
         mAuthListener = new FirebaseAuth.AuthStateListener(){
             @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth){
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth)
+            {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null){
-                    if(mUsuario == null){
+                if (user != null)
+                {
+                    if(mUsuario == null)
+                    {
                         mUsuario = new Usuario(user.getProviderData());
                         mAuthenticationActivity.beginProgram();
                     }
                 }
-                else{
+                else
+                {
                     mUsuario = null;
                 }
             }
         };
         mAccessTokenTracker = new AccessTokenTracker(){
             @Override
-            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken){
-                if (currentAccessToken == null){
-                    if(FirebaseAuth.getInstance().getCurrentUser() != null) {
+            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken)
+            {
+                if (currentAccessToken == null)
+                {
+                    if(FirebaseAuth.getInstance().getCurrentUser() != null)
+                    {
                         FirebaseAuth.getInstance().signOut();
                         ConstantsClass.Usuario = null;
                     }
@@ -66,33 +73,33 @@ public class WiTalkFirebaseAuthentication
             }
         };
     }
-
-    public void startListener(){
+    public void onStartListener(){
         mAuth.addAuthStateListener(mAuthListener);
     }
-    public void stopListener(){
+    public void onStopListener(){
         if (mAuthListener != null){mAuth.removeAuthStateListener(mAuthListener);}
     }
-    public void stopTracking(){
+    public void onStopTracking(){
         mAccessTokenTracker.stopTracking();
     }
-
     public void handleFacebookAccessToken(AccessToken token){
         Log.d("TAG", "handleFacebookAccessToken:" + token);
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
         mAuth.signInWithCredential(credential).addOnCompleteListener(mAuthenticationActivity,
         new OnCompleteListener<AuthResult>(){
             @Override
-            public void onComplete(@NonNull Task<AuthResult> task){
+            public void onComplete(@NonNull Task<AuthResult> task)
+            {
                 Log.d("TAG", "signInWithCredential:onComplete:" + task.isSuccessful());
-                if (!task.isSuccessful()){
+                if (!task.isSuccessful())
+                {
                     Log.w("TAG", "signInWithCredential", task.getException());
                     Toast.makeText(mAuthenticationActivity, "Authentication failed.",Toast.LENGTH_SHORT).show();
                 }
             }
         });
     }
-    public Usuario getUsuario(){
+    public Usuario onGetUsuario(){
         return mUsuario;
     }
 }

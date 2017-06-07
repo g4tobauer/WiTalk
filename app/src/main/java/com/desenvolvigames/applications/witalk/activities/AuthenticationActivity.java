@@ -22,42 +22,15 @@ import com.facebook.login.widget.LoginButton;
 
 import org.json.JSONObject;
 
-public class AuthenticationActivity extends AppCompatActivity implements IAsyncNotifiable
+public class AuthenticationActivity extends BaseActivity implements IAsyncNotifiable
 {
     private WiTalkFirebaseAuthentication mWiTalkFirebaseAuthentication;
     private LoginButton mLoginButton;
     private CallbackManager mCallbackManager;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        setContentView(R.layout.activity_authentication);
-        ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo mWifi = connManager.getActiveNetworkInfo();
-        if (mWifi.isConnected()) {
-            IniciarFacebook();
-            mWiTalkFirebaseAuthentication = new WiTalkFirebaseAuthentication(this);
-        }
-    }
-    @Override
-    protected void onStart(){
-        super.onStart();
-        mWiTalkFirebaseAuthentication.startListener();
-    }
-    @Override
-    protected void onStop(){
-        super.onStop();
-        mWiTalkFirebaseAuthentication.stopListener();
-    }
-    @Override
-    protected void onDestroy(){
-        mWiTalkFirebaseAuthentication.stopTracking();
-        super.onDestroy();
-    }
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data){
-        mCallbackManager.onActivityResult(requestCode,resultCode,data);
+    public Context GetContext() {
+        return this;
     }
     @Override
     public void ExecuteNotify(String tag, Object result) {
@@ -75,14 +48,54 @@ public class AuthenticationActivity extends AppCompatActivity implements IAsyncN
         }
     }
     @Override
-    public Context GetContext() {
-        return this;
-    }
-
-    private void IniciarFacebook(){
-        mCallbackManager = CallbackManager.Factory.create();
+    protected void onInitControls() {
         mLoginButton = (LoginButton)findViewById(R.id.fb_login_bn);
         mLoginButton.setReadPermissions("email", "public_profile");
+        mCallbackManager = CallbackManager.Factory.create();
+    }
+    @Override
+    protected void onInitEvents() {
+        onCallback();
+    }
+    @Override
+    protected void onSincronize() {
+        mWiTalkFirebaseAuthentication = new WiTalkFirebaseAuthentication(this);
+    }
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        setContentView(R.layout.activity_authentication);
+
+        ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo mWifi = connManager.getActiveNetworkInfo();
+        if (mWifi.isConnected()) {
+            onInitControls();
+            onInitEvents();
+            onSincronize();
+        }
+    }
+    @Override
+    protected void onStart(){
+        super.onStart();
+        mWiTalkFirebaseAuthentication.onStartListener();
+    }
+    @Override
+    protected void onStop(){
+        super.onStop();
+        mWiTalkFirebaseAuthentication.onStopListener();
+    }
+    @Override
+    protected void onDestroy(){
+        mWiTalkFirebaseAuthentication.onStopTracking();
+        super.onDestroy();
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        mCallbackManager.onActivityResult(requestCode,resultCode,data);
+    }
+
+    private void onCallback(){
         mLoginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>(){
             @Override
             public void onSuccess(LoginResult loginResult)
@@ -98,7 +111,7 @@ public class AuthenticationActivity extends AppCompatActivity implements IAsyncN
     }
     public void beginProgram(){
         if(ConstantsClass.Usuario == null)
-            ConstantsClass.Usuario = mWiTalkFirebaseAuthentication.getUsuario();
+            ConstantsClass.Usuario = mWiTalkFirebaseAuthentication.onGetUsuario();
         ConstantsClass.IpExterno = "";
         GetAsyncTask task = new GetAsyncTask(AuthenticationActivity.this);
         task.execute(ConstantsClass.GetIpUrl);

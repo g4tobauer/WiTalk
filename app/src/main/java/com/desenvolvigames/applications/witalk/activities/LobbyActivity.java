@@ -1,7 +1,7 @@
 package com.desenvolvigames.applications.witalk.activities;
 
 import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,59 +10,20 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.desenvolvigames.applications.witalk.R;
 import com.desenvolvigames.applications.witalk.entities.Contact;
-import com.desenvolvigames.applications.witalk.entities.Ip;
 import com.desenvolvigames.applications.witalk.interfaces.IAsyncNotifiable;
 import com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.Query;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class LobbyActivity extends AppCompatActivity implements IAsyncNotifiable, AdapterView.OnItemClickListener{
+public class LobbyActivity extends BaseActivity implements IAsyncNotifiable{
     private ListView mUiListLobby;
     private ContactsListAdapter mContactsAdapter;
     private List<Contact> mContactList = new ArrayList<>();
 
-//    Ip ip;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_lobby);
-        initControls();
-        initEvents();
-        sincronize();
-        ConstantsClass.Usuario.connect();
-    }
-
-    private void initControls(){
-        mUiListLobby = (ListView)findViewById(R.id.mUiListLobby);
-        setAdapter();
-    }
-    private void setAdapter(){
-        if(mContactsAdapter==null) {
-            mContactsAdapter = new ContactsListAdapter(LobbyActivity.this, mContactList);
-            mUiListLobby.setAdapter(mContactsAdapter);
-        }
-        mContactsAdapter.notifyDataSetChanged();
-    }
-    private void initEvents(){
-        mUiListLobby.setOnItemClickListener(this);
-    }
-    private void sincronize(){
-        ConstantsClass.Usuario.Sincronize(LobbyActivity.this);
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//        setAdapter();
-    }
     @Override
     public Context GetContext() {
         return this;
@@ -86,6 +47,44 @@ public class LobbyActivity extends AppCompatActivity implements IAsyncNotifiable
                 break;
         }
     }
+    @Override
+    protected void onInitControls() {
+        mUiListLobby = (ListView)findViewById(R.id.mUiListLobby);
+        setAdapter();
+    }
+    @Override
+    protected void onInitEvents() {
+        mUiListLobby.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Contact contact = (Contact) parent.getItemAtPosition(position);
+                Intent intent = new Intent(LobbyActivity.this, ContactActivity.class);
+                intent.putExtra("contact", contact);
+                startActivity(intent);
+            }
+        });
+    }
+    @Override
+    protected void onSincronize() {
+        ConstantsClass.Usuario.Sincronize(LobbyActivity.this);
+        ConstantsClass.Usuario.connect();
+    }
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_lobby);
+        onInitControls();
+        onInitEvents();
+        onSincronize();
+    }
+
+    private void setAdapter(){
+        if(mContactsAdapter==null) {
+            mContactsAdapter = new ContactsListAdapter(LobbyActivity.this, mContactList);
+            mUiListLobby.setAdapter(mContactsAdapter);
+        }
+        mContactsAdapter.notifyDataSetChanged();
+    }
 
     private class ContactsListAdapter extends BaseAdapter {
         private Context mContext;
@@ -100,22 +99,19 @@ public class LobbyActivity extends AppCompatActivity implements IAsyncNotifiable
         public int getCount() {
             return mContactList.size();
         }
-
         @Override
         public Contact getItem(int position) {
             return mContactList.get(position);
         }
-
         @Override
         public long getItemId(int position) {
             return position;
         }
-
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             Contact contact = mContactList.get(position);
             LayoutInflater inflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View view = inflater.inflate(R.layout.listadapter_lobby, parent,  false);
+            View view = inflater.inflate(R.layout.activity_lobby_adapter, parent,  false);
 
             TextView userNick = (TextView)view.findViewById(R.id.userNick);
             userNick.setText(contact.mNome);
@@ -135,5 +131,4 @@ public class LobbyActivity extends AppCompatActivity implements IAsyncNotifiable
             return view;
         }
     }
-
 }

@@ -10,29 +10,30 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.desenvolvigames.applications.witalk.R;
-import com.desenvolvigames.applications.witalk.entities.Usuario;
 import com.desenvolvigames.applications.witalk.interfaces.IAsyncNotifiable;
 import com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass;
 
-public class ConnectActivity extends AppCompatActivity implements IAsyncNotifiable{
-    private Button btnConnect;
+public class ConnectActivity extends BaseActivity implements IAsyncNotifiable{
+    private Button _btnConnect;
+    private Toolbar _toolbar;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_connect);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        initControls();
-        initEventos();
-        sincronize();
+    public Context GetContext() {
+        return this;
     }
-
-    private void initControls(){
-        btnConnect = (Button) findViewById(R.id.btnConnect);
+    @Override
+    public void ExecuteNotify(String tag, Object result) {
+        Toast.makeText(ConnectActivity.this, tag+" Sincronizado!", Toast.LENGTH_SHORT).show();
     }
-    private void initEventos(){
-        btnConnect.setOnClickListener(new View.OnClickListener() {
+    @Override
+    protected void onInitControls() {
+        _btnConnect = (Button) findViewById(R.id.btnConnect);
+        _toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(_toolbar);
+    }
+    @Override
+    protected void onInitEvents() {
+        _btnConnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ConnectActivity.this, LobbyActivity.class);
@@ -41,17 +42,16 @@ public class ConnectActivity extends AppCompatActivity implements IAsyncNotifiab
             }
         });
     }
-    private void sincronize(){
+    @Override
+    protected void onSincronize() {
         ConstantsClass.Usuario.Sincronize(ConnectActivity.this);
     }
-
     @Override
-    public Context GetContext() {
-        return this;
-    }
-
-    @Override
-    public void ExecuteNotify(String tag, Object result) {
-        Toast.makeText(ConnectActivity.this, tag+" Sincronizado!", Toast.LENGTH_SHORT).show();
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_connect);
+        onInitControls();
+        onInitEvents();
+        onSincronize();
     }
 }
