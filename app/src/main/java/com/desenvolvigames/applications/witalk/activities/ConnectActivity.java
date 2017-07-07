@@ -18,6 +18,14 @@ public class ConnectActivity extends BaseActivity implements IAsyncNotifiable{
     private Toolbar _toolbar;
 
     @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_connect);
+        onInitControls();
+        onInitEvents();
+        onSincronize();
+    }
+    @Override
     public Context GetContext() {
         return this;
     }
@@ -45,13 +53,5 @@ public class ConnectActivity extends BaseActivity implements IAsyncNotifiable{
     @Override
     protected void onSincronize() {
         ConstantsClass.Usuario.Sincronize(ConnectActivity.this);
-    }
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_connect);
-        onInitControls();
-        onInitEvents();
-        onSincronize();
     }
 }

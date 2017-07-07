@@ -43,7 +43,6 @@ public class LobbyActivity extends BaseActivity implements IAsyncNotifiable{
                 setAdapter();
                 break;
             default:
-                result = null;
                 break;
         }
     }
@@ -59,7 +58,7 @@ public class LobbyActivity extends BaseActivity implements IAsyncNotifiable{
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Contact contact = (Contact) parent.getItemAtPosition(position);
                 Intent intent = new Intent(LobbyActivity.this, ContactActivity.class);
-                intent.putExtra("contact", contact);
+                intent.putExtra(getString(R.string.entity_contact), contact);
                 startActivity(intent);
             }
         });

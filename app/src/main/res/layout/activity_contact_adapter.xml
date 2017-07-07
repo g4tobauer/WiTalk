@@ -1,22 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bubble_layout_parent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="2dp">
-    <TextView
-        android:id="@+id/txtContactNick"
-        android:layout_width="match_parent"
-        android:layout_height="22dp"
-        android:text="text"
-        android:layout_weight="0"
-        android:textColor="#704bea"/>
-    <TextView
-        android:id="@+id/txtContactMessage"
-        android:layout_width="match_parent"
+    android:padding="2dp"
+    android:orientation="vertical">
+    <LinearLayout
+        android:id="@+id/bubble_layout"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="mensagem"
-        android:layout_weight="1"
-        android:textColor="#704bea"/>
+        android:background="@drawable/bubble1">
+        <TextView
+            android:id="@+id/txtContactMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxEms="12"
+            android:layout_gravity="center"
+            android:text="Hi! new message"
+            android:textColor="@android:color/primary_text_light" />
+    </LinearLayout>
 </LinearLayout>

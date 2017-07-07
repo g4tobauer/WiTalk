@@ -1,6 +1,5 @@
 package com.desenvolvigames.applications.witalk.utilities.constants;
 
-import com.desenvolvigames.applications.witalk.entities.Ip;
 import com.desenvolvigames.applications.witalk.entities.Usuario;
 
 /**

@@ -42,10 +42,4 @@ public class JsonObjetcManagement
         }
         return jsonObject;
     }
-
-    private void foo()
-    {
-        JsonArray array = new JsonArray();
-        array.add(new JsonObject());
-    }
 }

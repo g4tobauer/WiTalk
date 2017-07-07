@@ -33,23 +33,15 @@ public class Ip extends EntityBase{
             lst = new ArrayList<>();
             lst.clear();
             for (DataSnapshot data : GetDataSnapshot().getChildren()) {
-                if(!data.getKey().equals("SyncTime"))
-                {
-                    Contact contact = new Contact();
-                    contact.mNome = String.valueOf(data.child("Nome").getValue());
-                    contact.mUserMessageToken = String.valueOf(data.child("UserMessageToken").getValue());
-                    lst.add(contact);
-                }
+                Contact contact = new Contact();
+                contact.mUserId = data.getKey();
+                contact.mNome = String.valueOf(data.child("Nome").getValue());
+                contact.mUserMessageToken = String.valueOf(data.child("UserMessageToken").getValue());
+                lst.add(contact);
             }
         }
         return lst;
     }
-
-//    @Override
-//    protected void SyncTime(DatabaseReference ref){
-////        DatabaseReference ref = GetRef().child(ConstantsClass.Usuario.getAuthenticationId());
-//        ref.child("SyncTime").setValue(mWiTalkFirebaseDatabaseManager.getTime());
-//    }
     @Override
     public DatabaseReference GetIpLobbyReference(){
         return GetRef();

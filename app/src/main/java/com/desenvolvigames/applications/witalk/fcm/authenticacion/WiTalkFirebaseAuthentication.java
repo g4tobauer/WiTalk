@@ -4,8 +4,10 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.desenvolvigames.applications.witalk.R;
 import com.desenvolvigames.applications.witalk.activities.AuthenticationActivity;
 import com.desenvolvigames.applications.witalk.entities.Usuario;
+import com.desenvolvigames.applications.witalk.utilities.connection.GetAsyncTask;
 import com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
@@ -23,7 +25,6 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class WiTalkFirebaseAuthentication
 {
-    private AccessTokenTracker mAccessTokenTracker;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseAuth mAuth;
     private AuthenticationActivity mAuthenticationActivity;
@@ -49,7 +50,7 @@ public class WiTalkFirebaseAuthentication
                     if(mUsuario == null)
                     {
                         mUsuario = new Usuario(user.getProviderData());
-                        mAuthenticationActivity.beginProgram();
+                        onBeginProgram();
                     }
                 }
                 else
@@ -58,48 +59,42 @@ public class WiTalkFirebaseAuthentication
                 }
             }
         };
-        mAccessTokenTracker = new AccessTokenTracker(){
-            @Override
-            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken)
-            {
-                if (currentAccessToken == null)
-                {
-                    if(FirebaseAuth.getInstance().getCurrentUser() != null)
-                    {
-                        FirebaseAuth.getInstance().signOut();
-                        ConstantsClass.Usuario = null;
-                    }
-                }
-            }
-        };
     }
+    private void onBeginProgram(){
+        if(ConstantsClass.Usuario == null)
+            ConstantsClass.Usuario = mUsuario;
+        ConstantsClass.IpExterno = "";
+        GetAsyncTask task = new GetAsyncTask(mAuthenticationActivity);
+        task.execute(ConstantsClass.GetIpUrl);
+    }
+
     public void onStartListener(){
         mAuth.addAuthStateListener(mAuthListener);
     }
     public void onStopListener(){
         if (mAuthListener != null){mAuth.removeAuthStateListener(mAuthListener);}
     }
-    public void onStopTracking(){
-        mAccessTokenTracker.stopTracking();
-    }
-    public void handleFacebookAccessToken(AccessToken token){
-        Log.d("TAG", "handleFacebookAccessToken:" + token);
+    public void onHandleFacebookAccessToken(AccessToken token){
+        Log.d(mAuthenticationActivity.getString(R.string.app_name), "handleFacebookAccessToken:" + token);
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
         mAuth.signInWithCredential(credential).addOnCompleteListener(mAuthenticationActivity,
         new OnCompleteListener<AuthResult>(){
             @Override
             public void onComplete(@NonNull Task<AuthResult> task)
             {
-                Log.d("TAG", "signInWithCredential:onComplete:" + task.isSuccessful());
+                Log.d(mAuthenticationActivity.getString(R.string.app_name), "signInWithCredential:onComplete:" + task.isSuccessful());
                 if (!task.isSuccessful())
                 {
-                    Log.w("TAG", "signInWithCredential", task.getException());
+                    Log.w(mAuthenticationActivity.getString(R.string.app_name), "signInWithCredential", task.getException());
                     Toast.makeText(mAuthenticationActivity, "Authentication failed.",Toast.LENGTH_SHORT).show();
                 }
             }
         });
     }
-    public Usuario onGetUsuario(){
-        return mUsuario;
+    public void signOut(){
+        mAuth.signOut();
+    }
+    public FirebaseUser getCurrentUser(){
+        return mAuth.getCurrentUser();
     }
 }

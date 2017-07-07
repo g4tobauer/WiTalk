@@ -34,7 +34,6 @@ public class BaseActivity extends AppCompatActivity implements IParameterNotifia
     private Tab_Usuario _tabUsuario;
     private LoginButton loginButton;
     private CallbackManager callbackManager;
-    private TextView txtView;
     private JSONObject jsonParameter;
 
     @Override
@@ -46,7 +45,6 @@ public class BaseActivity extends AppCompatActivity implements IParameterNotifia
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_main);
-        txtView = (TextView)findViewById(R.id.textView);
         IniciarControlesFacebook();
     }
     @Override

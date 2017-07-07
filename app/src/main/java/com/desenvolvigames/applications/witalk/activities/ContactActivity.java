@@ -1,8 +1,11 @@
 package com.desenvolvigames.applications.witalk.activities;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +20,7 @@ import android.widget.TextView;
 
 import com.desenvolvigames.applications.witalk.R;
 import com.desenvolvigames.applications.witalk.entities.Contact;
+import com.desenvolvigames.applications.witalk.fcm.services.NotificationData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,10 +32,31 @@ import java.util.List;
 public class ContactActivity extends BaseActivity {
     private Contact mContact;
     private ImageButton mBtnSend;
-    private ScrollView mScrollViewContactMessage;
     private EditText mEditTxtContactMessage;
     private ListView mLstViewContactMessage;
     private ContactAdapter mContactAdapter;
+
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle bundle = intent.getExtras();
+            String message = bundle.getString(getString(R.string.intent_message));
+            mContactAdapter.addMessage(message);
+            setAdapter();
+        }
+    };
+    @Override
+    protected void onStart() {
+        super.onStart();
+        LocalBroadcastManager.getInstance(this).registerReceiver((mMessageReceiver),
+                new IntentFilter(mContact.mUserId)
+        );
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -44,7 +69,6 @@ public class ContactActivity extends BaseActivity {
     @Override
     protected void onInitControls() {
         mBtnSend = (ImageButton) findViewById(R.id.btnSend);
-        mScrollViewContactMessage = (ScrollView) findViewById(R.id.scrollViewContactMessage);
         mEditTxtContactMessage = (EditText) findViewById(R.id.editTxtContactMessage);
         mLstViewContactMessage = (ListView) findViewById(R.id.lstViewContactMessage);
     }
@@ -57,7 +81,6 @@ public class ContactActivity extends BaseActivity {
                 if(!message.isEmpty())
                 {
                     mEditTxtContactMessage.setText("");
-                    mContact.mMessage.mLstMessage.add(message);
                     setAdapter();
                 }
             }
@@ -66,8 +89,9 @@ public class ContactActivity extends BaseActivity {
     @Override
     protected void onSincronize() {
         Bundle bundle =  getIntent().getExtras();
-        mContact = (Contact)bundle.get("contact");
-        mContact.onInitContactMessage();
+        if(bundle!=null) {
+            mContact = (Contact) bundle.get(getString(R.string.entity_contact));
+        }
         setAdapter();
     }
 
@@ -81,16 +105,18 @@ public class ContactActivity extends BaseActivity {
 
     private class ContactAdapter extends BaseAdapter {
         private Context mContext;
+        private List<String> mlstMessage;
         public ContactAdapter(Context context){
+            mlstMessage = new ArrayList<>();
             mContext = context;
         }
         @Override
         public int getCount() {
-            return mContact.mMessage.mLstMessage.size();
+            return mlstMessage.size();
         }
         @Override
         public String getItem(int position) {
-            return mContact.mMessage.mLstMessage.get(position);
+            return mlstMessage.get(position);
         }
         @Override
         public long getItemId(int position) {
@@ -98,15 +124,16 @@ public class ContactActivity extends BaseActivity {
         }
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            String nick = mContact.mNome;
-            String message = mContact.mMessage.mLstMessage.get(position);
+            String message = mlstMessage.get(position);
             LayoutInflater inflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View view = inflater.inflate(R.layout.activity_contact_adapter, parent,  false);
-            TextView contactNick = (TextView)view.findViewById(R.id.txtContactNick);
-            contactNick.setText(nick);
             TextView contactMessage = (TextView)view.findViewById(R.id.txtContactMessage);
             contactMessage.setText(message);
             return view;
+        }
+
+        public void addMessage(String message) {
+            mlstMessage.add(message);
         }
     }
 }

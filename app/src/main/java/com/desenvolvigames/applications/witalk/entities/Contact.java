@@ -8,20 +8,8 @@ import java.util.ArrayList;
  */
 
 public class Contact implements Serializable{
+    public String mUserId;
     public String mNome;
     public String mUserMessageToken;
     public String mUserImageResource;
-    public Message mMessage;
-
-    public void onInitContactMessage(){
-        if(mMessage==null)
-            mMessage = new Message();
-    }
-
-    public class Message{
-        public ArrayList<String> mLstMessage;
-        public Message(){
-            mLstMessage = new ArrayList<>();
-        }
-    }
 }

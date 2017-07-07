@@ -13,6 +13,8 @@ import com.desenvolvigames.applications.witalk.fcm.authenticacion.WiTalkFirebase
 import com.desenvolvigames.applications.witalk.interfaces.IAsyncNotifiable;
 import com.desenvolvigames.applications.witalk.utilities.connection.GetAsyncTask;
 import com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass;
+import com.facebook.AccessToken;
+import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -27,6 +29,7 @@ public class AuthenticationActivity extends BaseActivity implements IAsyncNotifi
     private WiTalkFirebaseAuthentication mWiTalkFirebaseAuthentication;
     private LoginButton mLoginButton;
     private CallbackManager mCallbackManager;
+    private AccessTokenTracker mAccessTokenTracker;
 
     @Override
     public Context GetContext() {
@@ -37,25 +40,39 @@ public class AuthenticationActivity extends BaseActivity implements IAsyncNotifi
         try {
             switch (tag) {
                 case ConstantsClass.GetIpUrl:
-                    ConstantsClass.IpExterno = new JSONObject((String)result).getString("ip").replace(".","x");
+                    ConstantsClass.IpExterno = new JSONObject((String)result).getString(getString(R.string.entity_ip).toLowerCase()).replace(".","x");
                     ConstantsClass.Usuario.setIpUsuario(ConstantsClass.IpExterno);
                     Intent intent = new Intent(AuthenticationActivity.this, ConnectActivity.class);
                     startActivity(intent);
                     break;
             }
         }catch (Exception ex){
-            Log.w("TAG", "signInWithCredential", ex);
+            Log.w(getString(R.string.app_name), "signInWithCredential", ex);
         }
     }
     @Override
     protected void onInitControls() {
         mLoginButton = (LoginButton)findViewById(R.id.fb_login_bn);
-        mLoginButton.setReadPermissions("email", "public_profile");
+        mLoginButton.setReadPermissions(getString(R.string.facebook_app_permission_email), getString(R.string.facebook_app_permission_publicprofile));
         mCallbackManager = CallbackManager.Factory.create();
     }
     @Override
     protected void onInitEvents() {
         onCallback();
+        mAccessTokenTracker = new AccessTokenTracker(){
+            @Override
+            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken)
+            {
+                if (currentAccessToken == null)
+                {
+                    if(mWiTalkFirebaseAuthentication.getCurrentUser() != null)
+                    {
+                        mWiTalkFirebaseAuthentication.signOut();
+                        ConstantsClass.Usuario = null;
+                    }
+                }
+            }
+        };
     }
     @Override
     protected void onSincronize() {
@@ -87,33 +104,24 @@ public class AuthenticationActivity extends BaseActivity implements IAsyncNotifi
     }
     @Override
     protected void onDestroy(){
-        mWiTalkFirebaseAuthentication.onStopTracking();
+        mAccessTokenTracker.stopTracking();
         super.onDestroy();
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         mCallbackManager.onActivityResult(requestCode,resultCode,data);
     }
-
     private void onCallback(){
         mLoginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>(){
             @Override
-            public void onSuccess(LoginResult loginResult)
-            {
-                Log.d("TAG", "facebook:onSuccess:" + loginResult);
-                mWiTalkFirebaseAuthentication.handleFacebookAccessToken(loginResult.getAccessToken());
+            public void onSuccess(LoginResult loginResult){
+                Log.d(getString(R.string.app_name), getString(R.string.facebook_app_message_success) + loginResult);
+                mWiTalkFirebaseAuthentication.onHandleFacebookAccessToken(loginResult.getAccessToken());
             }
             @Override
-            public void onCancel(){Log.d("TAG", "facebook:onCancel");}
+            public void onCancel(){Log.d(getString(R.string.app_name), getString(R.string.facebook_app_message_cancel));}
             @Override
-            public void onError(FacebookException error){Log.d("TAG", "facebook:onError", error);}
+            public void onError(FacebookException error){Log.d(getString(R.string.app_name), getString(R.string.facebook_app_message_error), error);}
         });
-    }
-    public void beginProgram(){
-        if(ConstantsClass.Usuario == null)
-            ConstantsClass.Usuario = mWiTalkFirebaseAuthentication.onGetUsuario();
-        ConstantsClass.IpExterno = "";
-        GetAsyncTask task = new GetAsyncTask(AuthenticationActivity.this);
-        task.execute(ConstantsClass.GetIpUrl);
     }
 }

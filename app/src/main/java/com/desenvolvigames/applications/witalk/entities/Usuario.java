@@ -1,8 +1,10 @@
 package com.desenvolvigames.applications.witalk.entities;
 
+import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
+import com.desenvolvigames.applications.witalk.R;
 import com.desenvolvigames.applications.witalk.fcm.database.WiTalkFirebaseDatabaseManager;
 import com.desenvolvigames.applications.witalk.interfaces.IAsyncNotifiable;
 import com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass;
@@ -25,16 +27,35 @@ public class Usuario extends EntityBase{
 
     public <T extends UserInfo>  Usuario(List<T> list){
         for (UserInfo user : list){
-            if(user.getProviderId().equals("firebase")){
+            if(user.getProviderId().equals(Resources.getSystem().getString(R.string.provider_firebaseid))){
                 mFirebaseUser = user;
             }
-            else if(user.getProviderId().equals("facebook.com")){
+            else if(user.getProviderId().equals(Resources.getSystem().getString(R.string.provider_facebookid))){
                 mFacebookUser = user;
             }
         }
         if(mWiTalkFirebaseDatabaseManager == null)
             mWiTalkFirebaseDatabaseManager = new WiTalkFirebaseDatabaseManager(this);
         Init();
+    }
+    @Override
+    protected void Init(){
+        DatabaseReference ref = GetRef();
+        ref.child(Resources.getSystem().getString(R.string.entity_usuario_firebaseuid)).setValue(mFirebaseUser.getUid());
+        ref.child(Resources.getSystem().getString(R.string.entity_usuario_facebookuid)).setValue(mFacebookUser.getUid());
+        ref.child(Resources.getSystem().getString(R.string.entity_usuario_name)).setValue(mFirebaseUser.getDisplayName());
+        ref.child(Resources.getSystem().getString(R.string.entity_usuario_email)).setValue(mFirebaseUser.getEmail());
+        ref.child(Resources.getSystem().getString(R.string.entity_usuario_imgurl)).setValue(mFirebaseUser.getPhotoUrl().toString());
+        ref.child(Resources.getSystem().getString(R.string.entity_usuario_messagetoken)).setValue(getFirebaseInstanceMessageToken());
+    }
+    @Override
+    public String GetRoot() {
+        return getClass().getSimpleName().concat("/").concat(mFirebaseUser.getUid());
+    }
+    @Override
+    public void Sincronize(IAsyncNotifiable asyncNotifiable){
+        mAsyncNotifiable = asyncNotifiable;
+        if(mIp!=null){mIp.Sincronize(mAsyncNotifiable);}
     }
 
     @Override
@@ -47,28 +68,9 @@ public class Usuario extends EntityBase{
         return mIp.GetIpLobbyReference();
     }
     @Override
-    protected void Init(){
-        DatabaseReference ref = GetRef();
-        ref.child("FirebaseUid").setValue(mFirebaseUser.getUid());
-        ref.child("FacebookUid").setValue(mFacebookUser.getUid());
-        ref.child("Nome").setValue(mFirebaseUser.getDisplayName());
-        ref.child("Email").setValue(mFirebaseUser.getEmail());
-        ref.child("ImgUrl").setValue(mFirebaseUser.getPhotoUrl().toString());
-        ref.child("UserMessageToken").setValue(getFirebaseInstanceMessageToken());
-    }
-    @Override
-    public void Sincronize(IAsyncNotifiable asyncNotifiable){
-        mAsyncNotifiable = asyncNotifiable;
-        if(mIp!=null){mIp.Sincronize(mAsyncNotifiable);}
-    }
-    @Override
     public void ExecuteNotify(String tag, Object result) {
         mIp = ((Ip)result);
         mAsyncNotifiable.ExecuteNotify(tag, Usuario.this);
-    }
-    @Override
-    public String GetRoot() {
-        return this.getClass().getSimpleName().concat("/").concat(mFirebaseUser.getUid());
     }
 
     public void connect(){
@@ -80,13 +82,13 @@ public class Usuario extends EntityBase{
         }
         Sincronize(mAsyncNotifiable);
     }
-    public void setIpUsuario(String ipUsuario){GetRef().child("IpUsuario").setValue(ipUsuario);}
+    public void setIpUsuario(String ipUsuario){GetRef().child(Resources.getSystem().getString(R.string.entity_usuario_ip)).setValue(ipUsuario);}
     public List<Contact> getLobbyList(){
         return mIp.getLobbyList();
     }
     private String getFirebaseInstanceMessageToken(){return FirebaseInstanceId.getInstance().getToken();}
     protected String getNomeUsuario(){return mFirebaseUser.getDisplayName();}
     protected String getAuthenticationId(){return mFirebaseUser.getUid();}
-    protected String getIpUsuario(){return mDataSnapshot.child("IpUsuario").getValue(String.class);}
-    protected String getUserMessageToken(){return mDataSnapshot.child("UserMessageToken").getValue(String.class);}
+    protected String getIpUsuario(){return mDataSnapshot.child(Resources.getSystem().getString(R.string.entity_usuario_ip)).getValue(String.class);}
+    protected String getUserMessageToken(){return mDataSnapshot.child(Resources.getSystem().getString(R.string.entity_usuario_messagetoken)).getValue(String.class);}
 }
