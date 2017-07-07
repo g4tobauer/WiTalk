@@ -11,6 +11,7 @@ import android.util.Log;
 
 import com.desenvolvigames.applications.witalk.R;
 import com.desenvolvigames.applications.witalk.activities.LobbyActivity;
+import com.desenvolvigames.applications.witalk.entities.MessageBody;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -30,28 +31,26 @@ public class WiTalkFirebaseMessagingService extends FirebaseMessagingService{
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        String image = remoteMessage.getNotification().getIcon();
-        String title = remoteMessage.getNotification().getTitle();
-        String text = remoteMessage.getNotification().getBody();
-        String sound = remoteMessage.getNotification().getSound();
 
-        String id = "";
-        Object obj = remoteMessage.getData().get("id");
-        if (obj != null) {
-            id = obj.toString();
+        MessageBody messageBody = new MessageBody();
+        messageBody.notification.title = remoteMessage.getNotification().getTitle();
+        messageBody.notification.icon = remoteMessage.getNotification().getIcon();
+        messageBody.notification.body = remoteMessage.getNotification().getBody();
+
+        if (!remoteMessage.getData().isEmpty()) {
+            messageBody.data.UserId = remoteMessage.getData().get("UserId");
+            messageBody.data.UserName = remoteMessage.getData().get("UserName");
+            messageBody.data.UserMessage = remoteMessage.getData().get("UserMessage");
+            messageBody.data.UserMessageToken = remoteMessage.getData().get("UserMessageToken");
         }
-        this.sendMessage(new NotificationData(image, id, title, text, sound));
-//        this.sendNotification(new NotificationData(image, id, title, text, sound));
+        this.sendMessage(messageBody);
+//        this.sendNotification(messageBody);
     }
-    /**
-     * Create and show a simple notification containing the received GCM message.
-     *
-     * @param notificationData GCM message received.
-     */
-    private void sendNotification(NotificationData notificationData) {
+
+    private void sendNotification(MessageBody messageBody) {
 
         Intent intent = new Intent(this, LobbyActivity.class);
-        intent.putExtra(getString(R.string.intent_notification), notificationData.getTextMessage());
+        intent.putExtra(getString(R.string.intent_notification), messageBody.notification.body);
 
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent, PendingIntent.FLAG_ONE_SHOT);
@@ -60,8 +59,8 @@ public class WiTalkFirebaseMessagingService extends FirebaseMessagingService{
         try {
             notificationBuilder = new NotificationCompat.Builder(this)
                     .setSmallIcon(R.mipmap.ic_notification)
-                    .setContentTitle(URLDecoder.decode(notificationData.getTitle(), "UTF-8"))
-                    .setContentText(URLDecoder.decode(notificationData.getTextMessage(), "UTF-8"))
+                    .setContentTitle(URLDecoder.decode(messageBody.notification.title, "UTF-8"))
+                    .setContentText(URLDecoder.decode(messageBody.notification.body, "UTF-8"))
                     .setAutoCancel(true)
                     .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                     .setContentIntent(pendingIntent);
@@ -79,9 +78,9 @@ public class WiTalkFirebaseMessagingService extends FirebaseMessagingService{
         }
     }
 
-    private void sendMessage(NotificationData notificationData) {
-        Intent intent = new Intent(notificationData.getId());
-        intent.putExtra(getString(R.string.intent_message), notificationData.getTextMessage());
+    private void sendMessage(MessageBody messageBody) {
+        Intent intent = new Intent(messageBody.data.UserId);
+        intent.putExtra(getString(R.string.intent_message), messageBody.data.UserMessage);
         broadcaster.sendBroadcast(intent);
     }
 }

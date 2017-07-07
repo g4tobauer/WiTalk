@@ -6,22 +6,19 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.desenvolvigames.applications.witalk.R;
+import com.desenvolvigames.applications.witalk.control.MessageSender;
 import com.desenvolvigames.applications.witalk.entities.Contact;
-import com.desenvolvigames.applications.witalk.fcm.services.NotificationData;
-
+import com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +32,7 @@ public class ContactActivity extends BaseActivity {
     private EditText mEditTxtContactMessage;
     private ListView mLstViewContactMessage;
     private ContactAdapter mContactAdapter;
+    private String mParameter;
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
@@ -80,8 +78,23 @@ public class ContactActivity extends BaseActivity {
                 String message = mEditTxtContactMessage.getText().toString();
                 if(!message.isEmpty())
                 {
-                    mEditTxtContactMessage.setText("");
-                    setAdapter();
+                    MessageSender messageSender = new MessageSender(getString(R.string.firebase_api_key));
+                    messageSender.getMessageBody().to = mContact.mUserMessageToken;
+
+                    messageSender.getMessageBody().data.UserMessage = message;
+                    messageSender.getMessageBody().data.UserId = mContact.mUserId;
+                    messageSender.getMessageBody().data.UserName = mContact.mNome;
+                    messageSender.getMessageBody().data.UserMessageToken = mContact.mUserMessageToken;
+
+                    if(message.length()>10)
+                        message = message.substring(0,9).concat("...");
+
+                    messageSender.getMessageBody().notification.body = message;
+                    messageSender.getMessageBody().notification.icon = "icon";
+                    messageSender.getMessageBody().notification.title = ConstantsClass.Usuario.getNomeUsuario();
+                    messageSender.sendMessage();
+//                    mEditTxtContactMessage.setText(message);
+//                    setAdapter();
                 }
             }
         });

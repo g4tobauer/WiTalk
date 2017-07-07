@@ -1,7 +1,5 @@
 package com.desenvolvigames.applications.witalk.entities;
 
-import android.os.AsyncTask;
-
 import com.desenvolvigames.applications.witalk.fcm.database.WiTalkFirebaseDatabaseManager;
 import com.desenvolvigames.applications.witalk.interfaces.IAsyncNotifiable;
 import com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass;

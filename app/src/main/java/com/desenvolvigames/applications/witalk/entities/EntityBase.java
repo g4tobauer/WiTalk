@@ -11,6 +11,8 @@ import com.desenvolvigames.applications.witalk.interfaces.IDataBaseManageable;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 
+import static com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass.SyncTime;
+
 /**
  * Created by Joao on 01/05/2017.
  */
@@ -42,9 +44,9 @@ public abstract class EntityBase implements IDataBaseManageable, IAsyncNotifiabl
     }
     protected void SyncTime(DatabaseReference ref){
         if(ref == null)
-            GetRef().child("SyncTime").setValue(mWiTalkFirebaseDatabaseManager.getTime());
+            GetRef().child(SyncTime).setValue(mWiTalkFirebaseDatabaseManager.getTime());
         else
-            ref.child("SyncTime").setValue(mWiTalkFirebaseDatabaseManager.getTime());
+            ref.child(SyncTime).setValue(mWiTalkFirebaseDatabaseManager.getTime());
     }
 
     public abstract void Sincronize(IAsyncNotifiable asyncNotifiable);

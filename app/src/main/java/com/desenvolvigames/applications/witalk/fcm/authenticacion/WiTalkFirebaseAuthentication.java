@@ -78,18 +78,18 @@ public class WiTalkFirebaseAuthentication
         Log.d(mAuthenticationActivity.getString(R.string.app_name), "handleFacebookAccessToken:" + token);
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
         mAuth.signInWithCredential(credential).addOnCompleteListener(mAuthenticationActivity,
-        new OnCompleteListener<AuthResult>(){
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task)
-            {
-                Log.d(mAuthenticationActivity.getString(R.string.app_name), "signInWithCredential:onComplete:" + task.isSuccessful());
-                if (!task.isSuccessful())
-                {
-                    Log.w(mAuthenticationActivity.getString(R.string.app_name), "signInWithCredential", task.getException());
-                    Toast.makeText(mAuthenticationActivity, "Authentication failed.",Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+                new OnCompleteListener<AuthResult>(){
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task)
+                    {
+                        Log.d(mAuthenticationActivity.getString(R.string.app_name), "signInWithCredential:onComplete:" + task.isSuccessful());
+                        if (!task.isSuccessful())
+                        {
+                            Log.w(mAuthenticationActivity.getString(R.string.app_name), "signInWithCredential", task.getException());
+                            Toast.makeText(mAuthenticationActivity, "Authentication failed.",Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
     public void signOut(){
         mAuth.signOut();
