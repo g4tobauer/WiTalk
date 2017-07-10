@@ -19,8 +19,8 @@ import static com.desenvolvigames.applications.witalk.utilities.constants.Consta
 
 public abstract class EntityBase implements IDataBaseManageable, IAsyncNotifiable {
 
-    protected IAsyncNotifiable mAsyncNotifiable;
     protected DataSnapshot mDataSnapshot;
+    protected IAsyncNotifiable mAsyncNotifiable;
     protected WiTalkFirebaseDatabaseManager mWiTalkFirebaseDatabaseManager;
 
     @Override
@@ -32,24 +32,24 @@ public abstract class EntityBase implements IDataBaseManageable, IAsyncNotifiabl
     public Context GetContext() {
         return mAsyncNotifiable.GetContext();
     }
-    protected DatabaseReference GetRef(){
-        return mWiTalkFirebaseDatabaseManager.getRef();
-    }
+    @Override
+    public void ExecuteNotify(String tag, Object result) {}
 
-    protected abstract void Init();
-    protected abstract void UpdateSnapshot();
-    protected abstract DatabaseReference GetIpLobbyReference();
-    protected DataSnapshot GetDataSnapshot(){
-        return mDataSnapshot;
-    }
     protected void SyncTime(DatabaseReference ref){
         if(ref == null)
             GetRef().child(SyncTime).setValue(mWiTalkFirebaseDatabaseManager.getTime());
         else
             ref.child(SyncTime).setValue(mWiTalkFirebaseDatabaseManager.getTime());
     }
+    protected DataSnapshot GetDataSnapshot(){
+        return mDataSnapshot;
+    }
+    protected DatabaseReference GetRef(){
+        return mWiTalkFirebaseDatabaseManager.getRef();
+    }
 
     public abstract void Sincronize(IAsyncNotifiable asyncNotifiable);
-    @Override
-    public void ExecuteNotify(String tag, Object result) {}
+    protected abstract void Init();
+    protected abstract void UpdateSnapshot();
+    protected abstract DatabaseReference GetIpLobbyReference();
 }

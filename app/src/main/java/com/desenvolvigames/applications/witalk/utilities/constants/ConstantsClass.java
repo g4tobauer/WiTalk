@@ -1,5 +1,6 @@
 package com.desenvolvigames.applications.witalk.utilities.constants;
 
+import com.desenvolvigames.applications.witalk.entities.Contact;
 import com.desenvolvigames.applications.witalk.entities.Usuario;
 
 /**
@@ -10,6 +11,7 @@ public class ConstantsClass
 {
     public static String IpExterno;
     public static Usuario Usuario;
+    public static Contact ContactOpened;
     public static final String GetIpUrl = "https://api.ipify.org?format=json";
     public static final String PostFirebaseMessage = "https://fcm.googleapis.com/fcm/send";
 

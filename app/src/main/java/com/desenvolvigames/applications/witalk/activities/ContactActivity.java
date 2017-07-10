@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,32 +28,31 @@ import java.util.List;
  */
 
 public class ContactActivity extends BaseActivity {
-    private Contact mContact;
+    //    private Contact mContact;
     private ImageButton mBtnSend;
     private EditText mEditTxtContactMessage;
     private ListView mLstViewContactMessage;
     private ContactAdapter mContactAdapter;
-    private String mParameter;
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle bundle = intent.getExtras();
             String message = bundle.getString(getString(R.string.intent_message));
-            mContactAdapter.addMessage(message);
-            setAdapter();
+            addMessage(message);
         }
     };
     @Override
     protected void onStart() {
         super.onStart();
         LocalBroadcastManager.getInstance(this).registerReceiver((mMessageReceiver),
-                new IntentFilter(mContact.mUserId)
+                new IntentFilter(ConstantsClass.ContactOpened.mUserId)
         );
     }
     @Override
     protected void onStop() {
         super.onStop();
+        ConstantsClass.ContactOpened = null;
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
     }
 
@@ -79,32 +79,44 @@ public class ContactActivity extends BaseActivity {
                 if(!message.isEmpty())
                 {
                     MessageSender messageSender = new MessageSender(getString(R.string.firebase_api_key));
-                    messageSender.getMessageBody().to = mContact.mUserMessageToken;
+                    messageSender.getMessageBody().to = ConstantsClass.ContactOpened.mUserMessageToken;
 
                     messageSender.getMessageBody().data.UserMessage = message;
-                    messageSender.getMessageBody().data.UserId = mContact.mUserId;
-                    messageSender.getMessageBody().data.UserName = mContact.mNome;
-                    messageSender.getMessageBody().data.UserMessageToken = mContact.mUserMessageToken;
+                    messageSender.getMessageBody().data.UserId = ConstantsClass.Usuario.getAuthenticationId();
+                    messageSender.getMessageBody().data.UserName = ConstantsClass.Usuario.getNomeUsuario();
+                    messageSender.getMessageBody().data.UserMessageToken = ConstantsClass.Usuario.getUserMessageToken();
 
                     if(message.length()>10)
-                        message = message.substring(0,9).concat("...");
+                        message = message.substring(0,9);
 
-                    messageSender.getMessageBody().notification.body = message;
-                    messageSender.getMessageBody().notification.icon = "icon";
+                    messageSender.getMessageBody().notification.body = message.concat("...");
+                    messageSender.getMessageBody().notification.icon = ConstantsClass.Usuario.getImgUrl();
                     messageSender.getMessageBody().notification.title = ConstantsClass.Usuario.getNomeUsuario();
-                    messageSender.sendMessage();
-//                    mEditTxtContactMessage.setText(message);
-//                    setAdapter();
+                    try{
+                        MessageSender.SenderResult senderResult = messageSender.sendMessage();
+                        if(senderResult != null){
+                            if(senderResult.success !=0){
+                                addMessage(message);
+                            }
+                        }
+                    }catch (Exception ex){
+                        Log.w("TAG", ex);
+                    }
                 }
             }
         });
     }
     @Override
     protected void onSincronize() {
-        Bundle bundle =  getIntent().getExtras();
-        if(bundle!=null) {
-            mContact = (Contact) bundle.get(getString(R.string.entity_contact));
-        }
+//        Bundle bundle =  getIntent().getExtras();
+//        if(bundle!=null) {
+//            mContact = (Contact) bundle.get(getString(R.string.entity_contact));
+//        }
+        setAdapter();
+    }
+
+    private void addMessage(String message){
+        mContactAdapter.addMessage(message);
         setAdapter();
     }
 

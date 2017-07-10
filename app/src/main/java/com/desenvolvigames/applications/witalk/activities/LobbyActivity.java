@@ -17,6 +17,7 @@ import com.desenvolvigames.applications.witalk.interfaces.IAsyncNotifiable;
 import com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class LobbyActivity extends BaseActivity implements IAsyncNotifiable{
@@ -38,6 +39,13 @@ public class LobbyActivity extends BaseActivity implements IAsyncNotifiable{
                 List<Contact> lst = ConstantsClass.Usuario.getLobbyList();
                 mContactList.clear();
                 if(lst != null) {
+                    Iterator<Contact> iterator = lst.iterator();
+                    while (iterator.hasNext()){
+                        Contact contact = iterator.next();
+                        if(contact.mUserId.equals(ConstantsClass.Usuario.getAuthenticationId())) {
+                            iterator.remove();
+                        }
+                    }
                     mContactList.addAll(lst);
                 }
                 setAdapter();
@@ -56,9 +64,9 @@ public class LobbyActivity extends BaseActivity implements IAsyncNotifiable{
         mUiListLobby.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Contact contact = (Contact) parent.getItemAtPosition(position);
+                ConstantsClass.ContactOpened = (Contact) parent.getItemAtPosition(position);
                 Intent intent = new Intent(LobbyActivity.this, ContactActivity.class);
-                intent.putExtra(getString(R.string.entity_contact), contact);
+//                intent.putExtra(getString(R.string.entity_contact), ConstantsClass.ContactOpened);
                 startActivity(intent);
             }
         });
@@ -79,7 +87,7 @@ public class LobbyActivity extends BaseActivity implements IAsyncNotifiable{
 
     private void setAdapter(){
         if(mContactsAdapter==null) {
-            mContactsAdapter = new ContactsListAdapter(LobbyActivity.this, mContactList);
+            mContactsAdapter = new ContactsListAdapter(LobbyActivity.this);
             mUiListLobby.setAdapter(mContactsAdapter);
         }
         mContactsAdapter.notifyDataSetChanged();
@@ -87,11 +95,9 @@ public class LobbyActivity extends BaseActivity implements IAsyncNotifiable{
 
     private class ContactsListAdapter extends BaseAdapter {
         private Context mContext;
-        private List<Contact> mContactList;
 
-        public ContactsListAdapter(Context context, List<Contact> contactList){
-            this.mContext = context;
-            mContactList = contactList;
+        public ContactsListAdapter(Context context){
+            mContext = context;
         }
 
         @Override

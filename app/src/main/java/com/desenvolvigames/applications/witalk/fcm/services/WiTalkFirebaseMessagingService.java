@@ -12,6 +12,7 @@ import android.util.Log;
 import com.desenvolvigames.applications.witalk.R;
 import com.desenvolvigames.applications.witalk.activities.LobbyActivity;
 import com.desenvolvigames.applications.witalk.entities.MessageBody;
+import com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -31,20 +32,27 @@ public class WiTalkFirebaseMessagingService extends FirebaseMessagingService{
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-
         MessageBody messageBody = new MessageBody();
         messageBody.notification.title = remoteMessage.getNotification().getTitle();
         messageBody.notification.icon = remoteMessage.getNotification().getIcon();
         messageBody.notification.body = remoteMessage.getNotification().getBody();
 
         if (!remoteMessage.getData().isEmpty()) {
-            messageBody.data.UserId = remoteMessage.getData().get("UserId");
-            messageBody.data.UserName = remoteMessage.getData().get("UserName");
-            messageBody.data.UserMessage = remoteMessage.getData().get("UserMessage");
-            messageBody.data.UserMessageToken = remoteMessage.getData().get("UserMessageToken");
+            messageBody.data.UserId = remoteMessage.getData().get(getString(R.string.messagebody_data_userid));
+            messageBody.data.UserName = remoteMessage.getData().get(getString(R.string.messagebody_data_username));
+            messageBody.data.UserMessage = remoteMessage.getData().get(getString(R.string.messagebody_data_usermessage));
+            messageBody.data.UserMessageToken = remoteMessage.getData().get(getString(R.string.messagebody_data_usermessagetoken));
         }
-        this.sendMessage(messageBody);
-//        this.sendNotification(messageBody);
+        if(ConstantsClass.ContactOpened != null && ConstantsClass.ContactOpened.mUserId != null && ConstantsClass.ContactOpened.mUserId.equals(messageBody.data.UserId))
+            sendMessage(messageBody);
+        else
+            sendNotification(messageBody);
+    }
+
+    private void sendMessage(MessageBody messageBody) {
+        Intent intent = new Intent(messageBody.data.UserId);
+        intent.putExtra(getString(R.string.intent_message), messageBody.data.UserMessage);
+        broadcaster.sendBroadcast(intent);
     }
 
     private void sendNotification(MessageBody messageBody) {
@@ -76,11 +84,5 @@ public class WiTalkFirebaseMessagingService extends FirebaseMessagingService{
         } else {
             Log.d(TAG, "Não foi possível criar objeto notificationBuilder");
         }
-    }
-
-    private void sendMessage(MessageBody messageBody) {
-        Intent intent = new Intent(messageBody.data.UserId);
-        intent.putExtra(getString(R.string.intent_message), messageBody.data.UserMessage);
-        broadcaster.sendBroadcast(intent);
     }
 }

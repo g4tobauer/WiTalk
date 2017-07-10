@@ -89,10 +89,11 @@ public class Usuario extends EntityBase{
     public List<Contact> getLobbyList(){
         return mIp.getLobbyList();
     }
+    public String getAuthenticationId(){return mFirebaseUser.getUid();}
     public String getNomeUsuario(){return mFirebaseUser.getDisplayName();}
+    public String getUserMessageToken(){return mDataSnapshot.child(UserMessageToken).getValue(String.class);}
+    public String getImgUrl(){return mDataSnapshot.child(ImgUrl).getValue(String.class);}
 
     private String getFirebaseInstanceMessageToken(){return FirebaseInstanceId.getInstance().getToken();}
-    protected String getAuthenticationId(){return mFirebaseUser.getUid();}
     protected String getIpUsuario(){return mDataSnapshot.child(IpUsuario).getValue(String.class);}
-    protected String getUserMessageToken(){return mDataSnapshot.child(UserMessageToken).getValue(String.class);}
 }

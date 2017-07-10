@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
 
 /**
  * Created by NOTEBOOK on 05/07/2017.
@@ -25,9 +26,9 @@ public class MessageSender  {
         mAuthentication = authentication;
     }
 
-    public void sendMessage(){
+    public SenderResult sendMessage() throws Exception{
         String json = new Gson().toJson(mMessageBody);
-        new PostMessageAsyncTask(json).execute();
+        return (SenderResult)new PostMessageAsyncTask(json).execute().get();
     }
 
     public MessageBody getMessageBody(){
@@ -68,7 +69,21 @@ public class MessageSender  {
                 if (urlConnection != null)
                     urlConnection.disconnect();
             }
-            return null;
+            return new Gson().fromJson(result.toString(), SenderResult.class);
+        }
+    }
+
+    public class SenderResult{
+        public Long multicast_id;
+        public Integer success;
+        public Integer failure;
+        public Integer canonical_ids;
+        public Results results[];
+
+        private SenderResult(){}
+
+        public class Results{
+            private String message_id;
         }
     }
 }
