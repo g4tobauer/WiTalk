@@ -8,25 +8,12 @@
     <string name="intent_message">message</string>
     <string name="intent_notification">notification</string>
 
-    <!--<string name="entity_usuario">Usuario</string>-->
-    <!--<string name="entity_usuario_ip">IpUsuario</string>-->
-    <!--<string name="entity_usuario_messagetoken">UserMessageToken</string>-->
-    <!--<string name="entity_usuario_firebaseuid">FirebaseUid</string>-->
-    <!--<string name="entity_usuario_facebookuid">FacebookUid</string>-->
-    <!--<string name="entity_usuario_name">Nome</string>-->
-    <!--<string name="entity_usuario_email">Email</string>-->
-    <!--<string name="entity_usuario_imgurl">ImgUrl</string>-->
-
-    <!--<string name="entity_contact">Contact</string>-->
     <string name="entity_ip">Ip</string>
 
     <string name="messagebody_data_userid">UserId</string>
     <string name="messagebody_data_username">UserName</string>
     <string name="messagebody_data_usermessage">UserMessage</string>
     <string name="messagebody_data_usermessagetoken">UserMessageToken</string>
-
-    <!--<string name="provider_firebaseid">firebase</string>-->
-    <!--<string name="provider_facebookid">facebook.com</string>-->
 
     <string name="facebook_app_id">218729791941718</string>
     <string name="facebook_app_permission_email">email</string>

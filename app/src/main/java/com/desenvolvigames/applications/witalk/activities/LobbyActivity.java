@@ -2,12 +2,17 @@ package com.desenvolvigames.applications.witalk.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -16,9 +21,13 @@ import com.desenvolvigames.applications.witalk.entities.Contact;
 import com.desenvolvigames.applications.witalk.interfaces.IAsyncNotifiable;
 import com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Handler;
+
+import javax.xml.parsers.SAXParserFactory;
 
 public class LobbyActivity extends BaseActivity implements IAsyncNotifiable{
     private ListView mUiListLobby;
@@ -43,7 +52,7 @@ public class LobbyActivity extends BaseActivity implements IAsyncNotifiable{
                     while (iterator.hasNext()){
                         Contact contact = iterator.next();
                         if(contact.mUserId.equals(ConstantsClass.Usuario.getAuthenticationId())) {
-                            iterator.remove();
+//                            iterator.remove();
                         }
                     }
                     mContactList.addAll(lst);
@@ -66,7 +75,6 @@ public class LobbyActivity extends BaseActivity implements IAsyncNotifiable{
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ConstantsClass.ContactOpened = (Contact) parent.getItemAtPosition(position);
                 Intent intent = new Intent(LobbyActivity.this, ContactActivity.class);
-//                intent.putExtra(getString(R.string.entity_contact), ConstantsClass.ContactOpened);
                 startActivity(intent);
             }
         });
@@ -114,9 +122,9 @@ public class LobbyActivity extends BaseActivity implements IAsyncNotifiable{
         }
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            Contact contact = mContactList.get(position);
+            final Contact contact = mContactList.get(position);
             LayoutInflater inflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View view = inflater.inflate(R.layout.activity_lobby_adapter, parent,  false);
+            final View view = inflater.inflate(R.layout.activity_lobby_adapter, parent,  false);
 
             TextView userNick = (TextView)view.findViewById(R.id.userNick);
             userNick.setText(contact.mNome);
@@ -124,15 +132,21 @@ public class LobbyActivity extends BaseActivity implements IAsyncNotifiable{
             TextView userStatus = (TextView)view.findViewById(R.id.userStatus);
             userStatus.setText(contact.mUserMessageToken);
 
-//            try {
-//                URL url = new URL(contact.mUserImageResource);
-//                Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-//                ImageView img = (ImageView) view.findViewById(R.id.userImageResource);
-//                img.setImageBitmap(bmp);
-//
-//            }catch(Exception ex){
-//                Log.w("TAG: ", ex);
-//            }
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        URL url = new URL(contact.mUserImageResource);
+                        Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                        ImageView img = (ImageView) view.findViewById(R.id.userImageResource);
+                        img.setImageBitmap(bmp);
+                        setAdapter();
+                    }catch(Exception ex){
+                        Log.w("TAG: ", ex);
+                    }
+                }
+            };
+            new Thread(runnable).start();
             return view;
         }
     }

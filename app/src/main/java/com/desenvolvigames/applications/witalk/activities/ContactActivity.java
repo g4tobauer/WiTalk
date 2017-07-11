@@ -108,10 +108,6 @@ public class ContactActivity extends BaseActivity {
     }
     @Override
     protected void onSincronize() {
-//        Bundle bundle =  getIntent().getExtras();
-//        if(bundle!=null) {
-//            mContact = (Contact) bundle.get(getString(R.string.entity_contact));
-//        }
         setAdapter();
     }
 

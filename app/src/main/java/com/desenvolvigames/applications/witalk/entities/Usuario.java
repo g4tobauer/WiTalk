@@ -11,11 +11,11 @@ import java.util.List;
 import static com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass.Email;
 import static com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass.FacebookUid;
 import static com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass.FirebaseUid;
-import static com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass.ImgUrl;
 import static com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass.IpUsuario;
 import static com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass.Nome;
 import static com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass.ProviderFacebookId;
 import static com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass.ProviderFirebaseId;
+import static com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass.UserImageSource;
 import static com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass.UserMessageToken;
 
 /**
@@ -48,7 +48,7 @@ public class Usuario extends EntityBase{
         ref.child(FacebookUid).setValue(mFacebookUser.getUid());
         ref.child(Nome).setValue(mFirebaseUser.getDisplayName());
         ref.child(Email).setValue(mFirebaseUser.getEmail());
-        ref.child(ImgUrl).setValue(mFirebaseUser.getPhotoUrl().toString());
+        ref.child(UserImageSource).setValue(mFirebaseUser.getPhotoUrl().toString());
         ref.child(UserMessageToken).setValue(getFirebaseInstanceMessageToken());
     }
     @Override
@@ -92,7 +92,7 @@ public class Usuario extends EntityBase{
     public String getAuthenticationId(){return mFirebaseUser.getUid();}
     public String getNomeUsuario(){return mFirebaseUser.getDisplayName();}
     public String getUserMessageToken(){return mDataSnapshot.child(UserMessageToken).getValue(String.class);}
-    public String getImgUrl(){return mDataSnapshot.child(ImgUrl).getValue(String.class);}
+    public String getImgUrl(){return mDataSnapshot.child(UserImageSource).getValue(String.class);}
 
     private String getFirebaseInstanceMessageToken(){return FirebaseInstanceId.getInstance().getToken();}
     protected String getIpUsuario(){return mDataSnapshot.child(IpUsuario).getValue(String.class);}

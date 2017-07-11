@@ -33,8 +33,9 @@ public class Ip extends EntityBase{
             for (DataSnapshot data : GetDataSnapshot().getChildren()) {
                 Contact contact = new Contact();
                 contact.mUserId = data.getKey();
-                contact.mNome = String.valueOf(data.child("Nome").getValue());
-                contact.mUserMessageToken = String.valueOf(data.child("UserMessageToken").getValue());
+                contact.mNome = String.valueOf(data.child(ConstantsClass.Nome).getValue());
+                contact.mUserMessageToken = String.valueOf(data.child(ConstantsClass.UserMessageToken).getValue());
+                contact.mUserImageResource = String.valueOf(data.child(ConstantsClass.UserImageSource).getValue());
                 lst.add(contact);
             }
         }
@@ -52,8 +53,9 @@ public class Ip extends EntityBase{
     @Override
     protected void Init(){
         DatabaseReference ref = GetRef().child(ConstantsClass.Usuario.getAuthenticationId());
-        ref.child("Nome").setValue(ConstantsClass.Usuario.getNomeUsuario());
-        ref.child("UserMessageToken").setValue(ConstantsClass.Usuario.getUserMessageToken());
+        ref.child(ConstantsClass.Nome).setValue(ConstantsClass.Usuario.getNomeUsuario());
+        ref.child(ConstantsClass.UserMessageToken).setValue(ConstantsClass.Usuario.getUserMessageToken());
+        ref.child(ConstantsClass.UserImageSource).setValue(ConstantsClass.Usuario.getImgUrl());
         SyncTime(ref);
     }
     @Override
