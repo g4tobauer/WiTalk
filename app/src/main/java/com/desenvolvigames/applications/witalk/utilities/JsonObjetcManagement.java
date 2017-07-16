@@ -1,4 +1,4 @@
-package com.desenvolvigames.applications.witalk.control;
+package com.desenvolvigames.applications.witalk.utilities;
 
 import android.util.Log;
 

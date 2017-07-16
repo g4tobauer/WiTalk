@@ -35,6 +35,7 @@
             android:name=".activities.ConnectActivity"
             android:label="@string/title_activity_connect"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".activities.AuthenticationActivity" />
         <activity android:name=".activities.LobbyActivity" />
         <activity android:name=".activities.ContactActivity" />
     </application>

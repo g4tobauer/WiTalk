@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.desenvolvigames.applications.witalk.R;
 import com.desenvolvigames.applications.witalk.interfaces.IAsyncNotifiable;
+import com.desenvolvigames.applications.witalk.utilities.OpenActivity;
 import com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass;
 
 public class ConnectActivity extends BaseActivity implements IAsyncNotifiable{
@@ -44,14 +45,18 @@ public class ConnectActivity extends BaseActivity implements IAsyncNotifiable{
         _btnConnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ConnectActivity.this, LobbyActivity.class);
-                startActivity(intent);
-                finish();
+                OpenActivity.onOpenActivity(ConnectActivity.this, LobbyActivity.class, null);
             }
         });
     }
     @Override
     protected void onSincronize() {
         ConstantsClass.Usuario.Sincronize(ConnectActivity.this);
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        OpenActivity.onOpenActivity(ConnectActivity.this, AuthenticationActivity.class, null);
     }
 }

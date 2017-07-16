@@ -13,9 +13,10 @@ public class ConstantsClass
     public static final String PostUsuarioObjectUrl = PostInserirUrl + "/PostUsuario";
     public static final String PostIpObjectUrl = PostInserirUrl + "/PostIp";
 
-    public static String IpExterno;
     public static Usuario Usuario;
     public static Contact ContactOpened;
+    public static String IpExterno;
+
     public static final String GetIpUrl = "https://api.ipify.org?format=json";
     public static final String PostFirebaseMessage = "https://fcm.googleapis.com/fcm/send";
 

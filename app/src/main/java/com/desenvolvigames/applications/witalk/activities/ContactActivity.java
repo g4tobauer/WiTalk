@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.desenvolvigames.applications.witalk.R;
 import com.desenvolvigames.applications.witalk.control.MessageSender;
 import com.desenvolvigames.applications.witalk.entities.Contact;
+import com.desenvolvigames.applications.witalk.utilities.OpenActivity;
 import com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,6 @@ import java.util.List;
  */
 
 public class ContactActivity extends BaseActivity {
-    //    private Contact mContact;
     private ImageButton mBtnSend;
     private EditText mEditTxtContactMessage;
     private ListView mLstViewContactMessage;
@@ -69,6 +69,8 @@ public class ContactActivity extends BaseActivity {
         mBtnSend = (ImageButton) findViewById(R.id.btnSend);
         mEditTxtContactMessage = (EditText) findViewById(R.id.editTxtContactMessage);
         mLstViewContactMessage = (ListView) findViewById(R.id.lstViewContactMessage);
+        mLstViewContactMessage.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
+        mLstViewContactMessage.setStackFromBottom(true);
     }
     @Override
     protected void onInitEvents() {
@@ -109,6 +111,10 @@ public class ContactActivity extends BaseActivity {
     @Override
     protected void onSincronize() {
         setAdapter();
+    }
+    @Override
+    public void onBackPressed() {
+        OpenActivity.onOpenActivity(ContactActivity.this, LobbyActivity.class, null);
     }
 
     private void addMessage(String message){

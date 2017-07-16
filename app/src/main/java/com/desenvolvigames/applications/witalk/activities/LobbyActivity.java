@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,15 +18,13 @@ import android.widget.TextView;
 import com.desenvolvigames.applications.witalk.R;
 import com.desenvolvigames.applications.witalk.entities.Contact;
 import com.desenvolvigames.applications.witalk.interfaces.IAsyncNotifiable;
+import com.desenvolvigames.applications.witalk.utilities.OpenActivity;
 import com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass;
 
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Handler;
-
-import javax.xml.parsers.SAXParserFactory;
 
 public class LobbyActivity extends BaseActivity implements IAsyncNotifiable{
     private ListView mUiListLobby;
@@ -74,8 +71,7 @@ public class LobbyActivity extends BaseActivity implements IAsyncNotifiable{
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ConstantsClass.ContactOpened = (Contact) parent.getItemAtPosition(position);
-                Intent intent = new Intent(LobbyActivity.this, ContactActivity.class);
-                startActivity(intent);
+                OpenActivity.onOpenActivity(LobbyActivity.this, ContactActivity.class, null);
             }
         });
     }
@@ -91,6 +87,10 @@ public class LobbyActivity extends BaseActivity implements IAsyncNotifiable{
         onInitControls();
         onInitEvents();
         onSincronize();
+    }
+    @Override
+    public void onBackPressed() {
+        OpenActivity.onOpenActivity(LobbyActivity.this, AuthenticationActivity.class, null);
     }
 
     private void setAdapter(){

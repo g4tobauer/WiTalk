@@ -7,10 +7,14 @@ import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
 import com.desenvolvigames.applications.witalk.R;
 import com.desenvolvigames.applications.witalk.fcm.authenticacion.WiTalkFirebaseAuthentication;
 import com.desenvolvigames.applications.witalk.interfaces.IAsyncNotifiable;
+import com.desenvolvigames.applications.witalk.utilities.OpenActivity;
 import com.desenvolvigames.applications.witalk.utilities.connection.GetAsyncTask;
 import com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass;
 import com.facebook.AccessToken;
@@ -27,6 +31,7 @@ import org.json.JSONObject;
 public class AuthenticationActivity extends BaseActivity implements IAsyncNotifiable
 {
     private WiTalkFirebaseAuthentication mWiTalkFirebaseAuthentication;
+    private Button btn_Entrar;
     private LoginButton mLoginButton;
     private CallbackManager mCallbackManager;
     private AccessTokenTracker mAccessTokenTracker;
@@ -42,8 +47,6 @@ public class AuthenticationActivity extends BaseActivity implements IAsyncNotifi
                 case ConstantsClass.GetIpUrl:
                     ConstantsClass.IpExterno = new JSONObject((String)result).getString(getString(R.string.entity_ip).toLowerCase()).replace(".","x");
                     ConstantsClass.Usuario.setIpUsuario(ConstantsClass.IpExterno);
-                    Intent intent = new Intent(AuthenticationActivity.this, ConnectActivity.class);
-                    startActivity(intent);
                     break;
             }
         }catch (Exception ex){
@@ -52,12 +55,22 @@ public class AuthenticationActivity extends BaseActivity implements IAsyncNotifi
     }
     @Override
     protected void onInitControls() {
+        btn_Entrar = (Button) findViewById(R.id.btn_Entrar);
         mLoginButton = (LoginButton)findViewById(R.id.fb_login_bn);
         mLoginButton.setReadPermissions(getString(R.string.facebook_app_permission_email), getString(R.string.facebook_app_permission_publicprofile));
         mCallbackManager = CallbackManager.Factory.create();
     }
     @Override
     protected void onInitEvents() {
+        btn_Entrar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(ConstantsClass.IpExterno != null)
+                    OpenActivity.onOpenActivity(AuthenticationActivity.this, ConnectActivity.class, null);
+                else
+                    Toast.makeText(AuthenticationActivity.this, "", Toast.LENGTH_SHORT);
+            }
+        });
         onCallback();
         mAccessTokenTracker = new AccessTokenTracker(){
             @Override
@@ -102,6 +115,7 @@ public class AuthenticationActivity extends BaseActivity implements IAsyncNotifi
         super.onStop();
         mWiTalkFirebaseAuthentication.onStopListener();
     }
+
     @Override
     protected void onDestroy(){
         mAccessTokenTracker.stopTracking();
@@ -111,6 +125,7 @@ public class AuthenticationActivity extends BaseActivity implements IAsyncNotifi
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         mCallbackManager.onActivityResult(requestCode,resultCode,data);
     }
+
     private void onCallback(){
         mLoginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>(){
             @Override
@@ -123,5 +138,13 @@ public class AuthenticationActivity extends BaseActivity implements IAsyncNotifi
             @Override
             public void onError(FacebookException error){Log.d(getString(R.string.app_name), getString(R.string.facebook_app_message_error), error);}
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(mWiTalkFirebaseAuthentication.getCurrentUser() == null)
+        {
+            super.onBackPressed();
+        }
     }
 }
