@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.desenvolvigames.applications.witalk.R;
 import com.desenvolvigames.applications.witalk.control.MessageSender;
 import com.desenvolvigames.applications.witalk.entities.Contact;
+import com.desenvolvigames.applications.witalk.entities.MessageBody;
 import com.desenvolvigames.applications.witalk.utilities.OpenActivity;
 import com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass;
 import java.util.ArrayList;
@@ -37,9 +38,24 @@ public class ContactActivity extends BaseActivity {
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Bundle bundle = intent.getExtras();
-            String message = bundle.getString(getString(R.string.intent_message));
-            addMessage(message);
+
+            MessageBody messageBody = null;
+            Bundle extras = intent.getExtras();
+            if(extras != null) {
+                if (extras.containsKey(getString(R.string.intent_message))) {
+                    Object object = extras.getSerializable(getString(R.string.intent_message));
+                    if(object instanceof MessageBody){
+                        messageBody = (MessageBody)object;
+                        object = null;
+                    }else {
+                        object = null;
+                    }
+                }
+            }
+
+//            Bundle bundle = intent.getExtras();
+//            String message = bundle.getString(getString(R.string.intent_message));
+            addMessage(messageBody.data.UserMessage);
         }
     };
     @Override
@@ -89,9 +105,9 @@ public class ContactActivity extends BaseActivity {
                     messageSender.getMessageBody().data.UserMessageToken = ConstantsClass.Usuario.getUserMessageToken();
 
                     if(message.length()>10)
-                        message = message.substring(0,9);
+                        message = message.substring(0,9).concat("...");
 
-                    messageSender.getMessageBody().notification.body = message.concat("...");
+                    messageSender.getMessageBody().notification.body = message;
                     messageSender.getMessageBody().notification.icon = ConstantsClass.Usuario.getImgUrl();
                     messageSender.getMessageBody().notification.title = ConstantsClass.Usuario.getNomeUsuario();
                     try{
@@ -112,9 +128,10 @@ public class ContactActivity extends BaseActivity {
     protected void onSincronize() {
         setAdapter();
     }
+
     @Override
     public void onBackPressed() {
-        OpenActivity.onOpenActivity(ContactActivity.this, LobbyActivity.class, null);
+        OpenActivity.onCloseAndOpenActivity(ContactActivity.this, LobbyActivity.class, null);
     }
 
     private void addMessage(String message){

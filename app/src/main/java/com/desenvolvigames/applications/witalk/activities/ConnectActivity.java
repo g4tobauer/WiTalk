@@ -1,18 +1,20 @@
 package com.desenvolvigames.applications.witalk.activities;
 
 import android.content.Context;
-import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
-
 import com.desenvolvigames.applications.witalk.R;
 import com.desenvolvigames.applications.witalk.interfaces.IAsyncNotifiable;
 import com.desenvolvigames.applications.witalk.utilities.OpenActivity;
+import com.desenvolvigames.applications.witalk.utilities.connection.GetAsyncTask;
 import com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass;
+
+import org.json.JSONObject;
 
 public class ConnectActivity extends BaseActivity implements IAsyncNotifiable{
     private Button _btnConnect;
@@ -32,7 +34,13 @@ public class ConnectActivity extends BaseActivity implements IAsyncNotifiable{
     }
     @Override
     public void ExecuteNotify(String tag, Object result) {
-        Toast.makeText(ConnectActivity.this, tag+" Sincronizado!", Toast.LENGTH_SHORT).show();
+        try{
+            ConstantsClass.IpExterno = new JSONObject((String)result).getString(getString(R.string.entity_ip).toLowerCase()).replace(".","x");
+            ConstantsClass.Usuario.setIpUsuario(ConstantsClass.IpExterno);
+            OpenActivity.onCloseAndOpenActivity(ConnectActivity.this, LobbyActivity.class, null);
+        }catch (Exception ex){
+            Log.w("TAG", ex);
+        }
     }
     @Override
     protected void onInitControls() {
@@ -45,7 +53,7 @@ public class ConnectActivity extends BaseActivity implements IAsyncNotifiable{
         _btnConnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                OpenActivity.onOpenActivity(ConnectActivity.this, LobbyActivity.class, null);
+                onConnectIp();
             }
         });
     }
@@ -54,9 +62,14 @@ public class ConnectActivity extends BaseActivity implements IAsyncNotifiable{
         ConstantsClass.Usuario.Sincronize(ConnectActivity.this);
     }
 
-
     @Override
     public void onBackPressed() {
-        OpenActivity.onOpenActivity(ConnectActivity.this, AuthenticationActivity.class, null);
+        OpenActivity.onCloseAndOpenActivity(ConnectActivity.this, AuthenticationActivity.class, null);
+    }
+
+    private void onConnectIp(){
+        ConstantsClass.IpExterno = "";
+        GetAsyncTask task = new GetAsyncTask(ConnectActivity.this);
+        task.execute(ConstantsClass.GetIpUrl);
     }
 }

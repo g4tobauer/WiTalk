@@ -34,16 +34,14 @@ public class GetAsyncTask extends AsyncTask<String,String,String>
         _context = asyncNotifiable.GetContext();
         _asyncNotifiable = asyncNotifiable;
     }
-    //Progress
+
     @Override
-    protected void onProgressUpdate(String... values){
-        super.onProgressUpdate(values);
-        Log.i("onProgressUpdate", "Exibindo ProgressDialog na tela Thread: " + Thread.currentThread().getName());
-        if(load == null)
-            load = ProgressDialog.show(_context, "Por favor Aguarde ...","Consultando ...",true, false);
-        load.setMessage("Consultando ... " + values[0]);
+    protected void onPreExecute() {
+        super.onPreExecute();
+        load = new ProgressDialog(_context);
+        load.setMessage("Loading...");
+        load.show();
     }
-    //Progress
 
     //Result
     //Params
@@ -59,7 +57,6 @@ public class GetAsyncTask extends AsyncTask<String,String,String>
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             String line;
             while ((line = reader.readLine()) != null){
-                publishProgress("");
                 result.append(line);
             }
         }catch(Exception ex){

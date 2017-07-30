@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -13,9 +12,7 @@ import android.widget.Toast;
 
 import com.desenvolvigames.applications.witalk.R;
 import com.desenvolvigames.applications.witalk.fcm.authenticacion.WiTalkFirebaseAuthentication;
-import com.desenvolvigames.applications.witalk.interfaces.IAsyncNotifiable;
 import com.desenvolvigames.applications.witalk.utilities.OpenActivity;
-import com.desenvolvigames.applications.witalk.utilities.connection.GetAsyncTask;
 import com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
@@ -26,9 +23,7 @@ import com.facebook.FacebookSdk;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
-import org.json.JSONObject;
-
-public class AuthenticationActivity extends BaseActivity implements IAsyncNotifiable
+public class AuthenticationActivity extends BaseActivity //implements IAsyncNotifiable
 {
     private WiTalkFirebaseAuthentication mWiTalkFirebaseAuthentication;
     private Button btn_Entrar;
@@ -36,23 +31,6 @@ public class AuthenticationActivity extends BaseActivity implements IAsyncNotifi
     private CallbackManager mCallbackManager;
     private AccessTokenTracker mAccessTokenTracker;
 
-    @Override
-    public Context GetContext() {
-        return this;
-    }
-    @Override
-    public void ExecuteNotify(String tag, Object result) {
-        try {
-            switch (tag) {
-                case ConstantsClass.GetIpUrl:
-                    ConstantsClass.IpExterno = new JSONObject((String)result).getString(getString(R.string.entity_ip).toLowerCase()).replace(".","x");
-                    ConstantsClass.Usuario.setIpUsuario(ConstantsClass.IpExterno);
-                    break;
-            }
-        }catch (Exception ex){
-            Log.w(getString(R.string.app_name), "signInWithCredential", ex);
-        }
-    }
     @Override
     protected void onInitControls() {
         btn_Entrar = (Button) findViewById(R.id.btn_Entrar);
@@ -65,10 +43,10 @@ public class AuthenticationActivity extends BaseActivity implements IAsyncNotifi
         btn_Entrar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(ConstantsClass.IpExterno != null)
-                    OpenActivity.onOpenActivity(AuthenticationActivity.this, ConnectActivity.class, null);
+                if(ConstantsClass.Usuario != null)
+                    OpenActivity.onCloseAndOpenActivity(AuthenticationActivity.this, ConnectActivity.class, null);
                 else
-                    Toast.makeText(AuthenticationActivity.this, "", Toast.LENGTH_SHORT);
+                    Toast.makeText(AuthenticationActivity.this, "Usuário não encontrado!", Toast.LENGTH_SHORT).show();
             }
         });
         onCallback();
@@ -138,13 +116,5 @@ public class AuthenticationActivity extends BaseActivity implements IAsyncNotifi
             @Override
             public void onError(FacebookException error){Log.d(getString(R.string.app_name), getString(R.string.facebook_app_message_error), error);}
         });
-    }
-
-    @Override
-    public void onBackPressed() {
-        if(mWiTalkFirebaseAuthentication.getCurrentUser() == null)
-        {
-            super.onBackPressed();
-        }
     }
 }

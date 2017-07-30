@@ -10,12 +10,15 @@ import android.support.v7.app.AppCompatActivity;
  */
 
 public class OpenActivity {
-    public static <T extends AppCompatActivity> void onOpenActivity(AppCompatActivity context, Class<T> openClass, Bundle extras){
+    public static <T extends AppCompatActivity> void onCloseAndOpenActivity(AppCompatActivity context, Class<T> openClass, Bundle extras){
+        onJustOpenActivity(context, openClass, extras);
+        context.finish();
+    }
+    private static <T extends AppCompatActivity> void onJustOpenActivity(AppCompatActivity context, Class<T> openClass, Bundle extras){
         Intent intent = new Intent(context, openClass);
         if(extras != null){
             intent.putExtras(extras);
         }
         context.startActivity(intent);
-        context.finish();
     }
 }

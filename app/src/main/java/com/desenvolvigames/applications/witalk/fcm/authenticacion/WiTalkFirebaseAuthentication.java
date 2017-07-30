@@ -7,10 +7,8 @@ import android.widget.Toast;
 import com.desenvolvigames.applications.witalk.R;
 import com.desenvolvigames.applications.witalk.activities.AuthenticationActivity;
 import com.desenvolvigames.applications.witalk.entities.Usuario;
-import com.desenvolvigames.applications.witalk.utilities.connection.GetAsyncTask;
 import com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass;
 import com.facebook.AccessToken;
-import com.facebook.AccessTokenTracker;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
@@ -50,7 +48,9 @@ public class WiTalkFirebaseAuthentication
                     if(mUsuario == null)
                     {
                         mUsuario = new Usuario(user.getProviderData());
-                        onBeginProgram();
+                        if(ConstantsClass.Usuario == null)
+                            ConstantsClass.Usuario = mUsuario;
+//                        onBeginProgram();
                     }
                 }
                 else
@@ -60,13 +60,7 @@ public class WiTalkFirebaseAuthentication
             }
         };
     }
-    private void onBeginProgram(){
-        if(ConstantsClass.Usuario == null)
-            ConstantsClass.Usuario = mUsuario;
-        ConstantsClass.IpExterno = "";
-        GetAsyncTask task = new GetAsyncTask(mAuthenticationActivity);
-        task.execute(ConstantsClass.GetIpUrl);
-    }
+
 
     public void onStartListener(){
         mAuth.addAuthStateListener(mAuthListener);

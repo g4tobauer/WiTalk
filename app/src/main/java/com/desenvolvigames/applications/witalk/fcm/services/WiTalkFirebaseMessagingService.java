@@ -5,12 +5,15 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
+import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.desenvolvigames.applications.witalk.R;
 import com.desenvolvigames.applications.witalk.activities.LobbyActivity;
+import com.desenvolvigames.applications.witalk.entities.Contact;
 import com.desenvolvigames.applications.witalk.entities.MessageBody;
 import com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass;
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -50,37 +53,40 @@ public class WiTalkFirebaseMessagingService extends FirebaseMessagingService{
     }
 
     private void sendMessage(MessageBody messageBody) {
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(getString(R.string.intent_message),messageBody);
         Intent intent = new Intent(messageBody.data.UserId);
-        intent.putExtra(getString(R.string.intent_message), messageBody.data.UserMessage);
+        intent.putExtras(bundle);
         broadcaster.sendBroadcast(intent);
     }
 
-    private void sendNotification(MessageBody messageBody) {
+    private void sendNotification(MessageBody messageBody){
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(getString(R.string.intent_notification),messageBody);
 
-        Intent intent = new Intent(this, LobbyActivity.class);
-        intent.putExtra(getString(R.string.intent_notification), messageBody.notification.body);
-
+        Intent intent = new Intent(WiTalkFirebaseMessagingService.this, LobbyActivity.class);
+        intent.putExtras(bundle);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent, PendingIntent.FLAG_ONE_SHOT);
+        NotificationCompat.Builder mBuilder = null;
+        try{
 
-        NotificationCompat.Builder notificationBuilder = null;
-        try {
-            notificationBuilder = new NotificationCompat.Builder(this)
-                    .setSmallIcon(R.mipmap.ic_notification)
-                    .setContentTitle(URLDecoder.decode(messageBody.notification.title, "UTF-8"))
-                    .setContentText(URLDecoder.decode(messageBody.notification.body, "UTF-8"))
-                    .setAutoCancel(true)
-                    .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                    .setContentIntent(pendingIntent);
+            mBuilder = new NotificationCompat.Builder(WiTalkFirebaseMessagingService.this)
+            .setSmallIcon(R.mipmap.ic_notification)
+            .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+            .setContentTitle(URLDecoder.decode(messageBody.notification.title, "UTF-8"))
+            .setContentText(URLDecoder.decode(messageBody.notification.body, "UTF-8"))
+            .setAutoCancel(true);
 
-        } catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException e)
+        {
             e.printStackTrace();
         }
-
-        if (notificationBuilder != null) {
-            NotificationManager notificationManager =
-                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.notify(0, notificationBuilder.build());
+        if(mBuilder != null) {
+            PendingIntent resultPendingIntent = PendingIntent.getActivity(WiTalkFirebaseMessagingService.this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+            mBuilder.setContentIntent(resultPendingIntent);
+            int mNotificationId = 001;
+            NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            mNotifyMgr.notify(mNotificationId, mBuilder.build());
         } else {
             Log.d(TAG, "Não foi possível criar objeto notificationBuilder");
         }
