@@ -10,6 +10,7 @@ import java.util.ArrayList;
 public class Contact implements Serializable{
     public String mUserId;
     public String mNome;
+    public String mStatus;
     public String mUserMessageToken;
     public String mUserImageResource;
 }

@@ -19,7 +19,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_weight="1">
 
         <com.facebook.login.widget.LoginButton
             android:id="@+id/fb_login_bn"
@@ -53,4 +54,10 @@
             <!--android:textColor="@android:color/white"/>-->
 
     </RelativeLayout>
+
+    <!--<Button-->
+        <!--android:layout_weight="0"-->
+        <!--android:id="@+id/btn_Sair"-->
+        <!--android:text="Sair"-->
+        <!--style="@style/ButtonStyle"/>-->
 </LinearLayout>

@@ -29,6 +29,7 @@ public class ConstantsClass
     public static final String FacebookUid = "FacebookUid";
     public static final String IpUsuario = "IpUsuario";
     public static final String SyncTime = "SyncTime";
+    public static final String Status = "Status";
     public static final String Email = "Email";
     public static final String Nome = "Nome";
 }

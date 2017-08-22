@@ -15,6 +15,7 @@ import static com.desenvolvigames.applications.witalk.utilities.constants.Consta
 import static com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass.Nome;
 import static com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass.ProviderFacebookId;
 import static com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass.ProviderFirebaseId;
+import static com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass.Status;
 import static com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass.UserImageSource;
 import static com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass.UserMessageToken;
 
@@ -24,16 +25,21 @@ import static com.desenvolvigames.applications.witalk.utilities.constants.Consta
 
 public class Usuario extends EntityBase{
 
+    private final String USERNODE =  (getClass().getSimpleName() + NODE).toUpperCase();
     private UserInfo mFirebaseUser;
     private UserInfo mFacebookUser;
     private Ip mIp;
+    private boolean mIsConnected;
 
     public <T extends UserInfo>  Usuario(List<T> list){
-        for (UserInfo user : list){
-            if(user.getProviderId().equals(ProviderFirebaseId)){
+        for (UserInfo user : list)
+        {
+            if(user.getProviderId().equals(ProviderFirebaseId))
+            {
                 mFirebaseUser = user;
             }
-            else if(user.getProviderId().equals(ProviderFacebookId)){
+            else if(user.getProviderId().equals(ProviderFacebookId))
+            {
                 mFacebookUser = user;
             }
         }
@@ -41,22 +47,27 @@ public class Usuario extends EntityBase{
             mWiTalkFirebaseDatabaseManager = new WiTalkFirebaseDatabaseManager(this);
         Init();
     }
+
     @Override
     protected void Init(){
-        DatabaseReference ref = GetRef();
+        DatabaseReference ref = mWiTalkFirebaseDatabaseManager.getRef();
         ref.child(FirebaseUid).setValue(mFirebaseUser.getUid());
         ref.child(FacebookUid).setValue(mFacebookUser.getUid());
         ref.child(Nome).setValue(mFirebaseUser.getDisplayName());
+        ref.child(Status).setValue("Olá !");
         ref.child(Email).setValue(mFirebaseUser.getEmail());
         ref.child(UserImageSource).setValue(mFirebaseUser.getPhotoUrl().toString());
         ref.child(UserMessageToken).setValue(getFirebaseInstanceMessageToken());
     }
+
     @Override
     public String GetRoot() {
-        return getClass().getSimpleName().concat("/").concat(mFirebaseUser.getUid());
+        return (USERNODE + "/" + mFirebaseUser.getUid());
     }
+
     @Override
     public void Sincronize(IAsyncNotifiable asyncNotifiable){
+        SyncTime(mWiTalkFirebaseDatabaseManager.getRef());
         mAsyncNotifiable = asyncNotifiable;
         if(mIp!=null){mIp.Sincronize(mAsyncNotifiable);}
     }
@@ -66,45 +77,62 @@ public class Usuario extends EntityBase{
         if(mAsyncNotifiable!=null)
             mAsyncNotifiable.ExecuteNotify(Usuario.this.getClass().getSimpleName(), Usuario.this);
     }
-    @Override
-    public DatabaseReference GetIpLobbyReference() {
-        return mIp.GetIpLobbyReference();
-    }
-    @Override
-    public void ExecuteNotify(String tag, Object result) {
-        mIp = ((Ip)result);
-        mAsyncNotifiable.ExecuteNotify(tag, Usuario.this);
-    }
 
-    public void connect(){
-        if(mIp == null){
+    public void connect(IAsyncNotifiable asyncNotifiable){
+        if(mIp == null)
+        {
             mIp = new Ip();
         }else{
-            SyncTime(null);
             mIp.Init();
         }
-        Sincronize(mAsyncNotifiable);
+        Sincronize(asyncNotifiable);
+        mIsConnected = true;
     }
-    public void setIpUsuario(String ipUsuario){GetRef().child(IpUsuario).setValue(ipUsuario);}
+
+    public void disconnect(){
+        if(mIp != null ) {
+            mIp.disconnect();
+            mIsConnected = false;
+        }
+    }
+
+    public boolean isConnected(){
+        return mIsConnected;
+    }
+
+    public void setIpUsuario(String ipUsuario){
+        mWiTalkFirebaseDatabaseManager.getRef().child(IpUsuario).setValue(ipUsuario);
+    }
+
     public List<Contact> getLobbyList(){
         return mIp.getLobbyList();
     }
+
     public String getAuthenticationId(){
         return mFirebaseUser.getUid();
     }
+
     public String getNomeUsuario(){
         return mFirebaseUser.getDisplayName();
     }
+
     public String getUserMessageToken(){
         return mDataSnapshot.child(UserMessageToken).getValue(String.class);
     }
+
     public String getImgUrl(){
         return mDataSnapshot.child(UserImageSource).getValue(String.class);
     }
-    private String getFirebaseInstanceMessageToken(){
-        return FirebaseInstanceId.getInstance().getToken();
+
+    public String getStatus(){
+        return mDataSnapshot.child(Status).getValue(String.class);
     }
+
     protected String getIpUsuario(){
         return mDataSnapshot.child(IpUsuario).getValue(String.class);
+    }
+
+    private String getFirebaseInstanceMessageToken(){
+        return FirebaseInstanceId.getInstance().getToken();
     }
 }

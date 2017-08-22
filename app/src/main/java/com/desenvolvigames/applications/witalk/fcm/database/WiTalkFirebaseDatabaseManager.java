@@ -17,18 +17,19 @@ import java.util.Map;
 public class WiTalkFirebaseDatabaseManager
 {
     private IDataBaseManageable mManageable;
-    private DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
     private DatabaseReference mConditionRef;
 
     public WiTalkFirebaseDatabaseManager(IDataBaseManageable manageable){
         mManageable = manageable;
-        mConditionRef = mRootRef.child(mManageable.GetRoot());
+        mConditionRef = FirebaseDatabase.getInstance().getReference().child(mManageable.GetRoot());
         IniciarFirebaseDatabase();
     }
     private void IniciarFirebaseDatabase(){
-        mConditionRef.addValueEventListener(new ValueEventListener(){
+        mConditionRef.addValueEventListener(new ValueEventListener()
+        {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot){
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
                 mManageable.DataSnapshotUpdate(dataSnapshot);
             }
             @Override

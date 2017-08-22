@@ -29,20 +29,6 @@ public class ConnectActivity extends BaseActivity implements IAsyncNotifiable{
         onSincronize();
     }
     @Override
-    public Context GetContext() {
-        return this;
-    }
-    @Override
-    public void ExecuteNotify(String tag, Object result) {
-        try{
-            ConstantsClass.IpExterno = new JSONObject((String)result).getString(getString(R.string.entity_ip).toLowerCase()).replace(".","x");
-            ConstantsClass.Usuario.setIpUsuario(ConstantsClass.IpExterno);
-            OpenActivity.onCloseAndOpenActivity(ConnectActivity.this, LobbyActivity.class, null);
-        }catch (Exception ex){
-            Log.w("TAG", ex);
-        }
-    }
-    @Override
     protected void onInitControls() {
         _btnConnect = (Button) findViewById(R.id.btnConnect);
         _toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -60,6 +46,21 @@ public class ConnectActivity extends BaseActivity implements IAsyncNotifiable{
     @Override
     protected void onSincronize() {
         ConstantsClass.Usuario.Sincronize(ConnectActivity.this);
+    }
+
+    @Override
+    public Context GetContext() {
+        return this;
+    }
+    @Override
+    public void ExecuteNotify(String tag, Object result) {
+        try{
+            ConstantsClass.IpExterno = new JSONObject((String)result).getString(getString(R.string.entity_ip).toLowerCase()).replace(".","x");
+            ConstantsClass.Usuario.setIpUsuario(ConstantsClass.IpExterno);
+            OpenActivity.onCloseAndOpenActivity(ConnectActivity.this, LobbyActivity.class, null);
+        }catch (Exception ex){
+            Log.w("TAG", ex);
+        }
     }
 
     @Override

@@ -15,11 +15,9 @@ import java.util.List;
 
 public class Ip extends EntityBase{
 
-    private static final String IPNODE = "IpNode";
-    private String mIp;
+    private final String IPNODE =  (getClass().getSimpleName() + NODE).toUpperCase();
 
     public Ip(){
-        mIp = ConstantsClass.Usuario.getIpUsuario();
         if(mWiTalkFirebaseDatabaseManager == null)
             mWiTalkFirebaseDatabaseManager = new WiTalkFirebaseDatabaseManager(this);
         Init();
@@ -27,13 +25,14 @@ public class Ip extends EntityBase{
 
     public List<Contact> getLobbyList(){
         ArrayList<Contact> lst = null;
-        if(GetDataSnapshot() != null) {
+        if(mDataSnapshot != null) {
             lst = new ArrayList<>();
             lst.clear();
-            for (DataSnapshot data : GetDataSnapshot().getChildren()) {
+            for (DataSnapshot data : mDataSnapshot.getChildren()) {
                 Contact contact = new Contact();
                 contact.mUserId = data.getKey();
                 contact.mNome = String.valueOf(data.child(ConstantsClass.Nome).getValue());
+                contact.mStatus = String.valueOf(data.child(ConstantsClass.Status).getValue());
                 contact.mUserMessageToken = String.valueOf(data.child(ConstantsClass.UserMessageToken).getValue());
                 contact.mUserImageResource = String.valueOf(data.child(ConstantsClass.UserImageSource).getValue());
                 lst.add(contact);
@@ -41,29 +40,34 @@ public class Ip extends EntityBase{
         }
         return lst;
     }
+
     @Override
-    public DatabaseReference GetIpLobbyReference(){
-        return GetRef();
+    protected void Init(){
+        DatabaseReference ref = mWiTalkFirebaseDatabaseManager.getRef().child(ConstantsClass.Usuario.getAuthenticationId());
+        ref.child(ConstantsClass.Nome).setValue(ConstantsClass.Usuario.getNomeUsuario());
+        ref.child(ConstantsClass.Status).setValue(ConstantsClass.Usuario.getStatus());
+        ref.child(ConstantsClass.UserMessageToken).setValue(ConstantsClass.Usuario.getUserMessageToken());
+        ref.child(ConstantsClass.UserImageSource).setValue(ConstantsClass.Usuario.getImgUrl());
+        SyncTime(ref);
     }
+
     @Override
     protected void UpdateSnapshot(){
         if(mAsyncNotifiable!=null)
             mAsyncNotifiable.ExecuteNotify(Ip.this.getClass().getSimpleName(), Ip.this);
     }
-    @Override
-    protected void Init(){
-        DatabaseReference ref = GetRef().child(ConstantsClass.Usuario.getAuthenticationId());
-        ref.child(ConstantsClass.Nome).setValue(ConstantsClass.Usuario.getNomeUsuario());
-        ref.child(ConstantsClass.UserMessageToken).setValue(ConstantsClass.Usuario.getUserMessageToken());
-        ref.child(ConstantsClass.UserImageSource).setValue(ConstantsClass.Usuario.getImgUrl());
-        SyncTime(ref);
-    }
+
     @Override
     public void Sincronize(IAsyncNotifiable asyncNotifiable) {
         mAsyncNotifiable = asyncNotifiable;
     }
+
     @Override
     public String GetRoot() {
-        return IPNODE.concat("/").concat(mIp);
+        return (IPNODE + "/" + ConstantsClass.Usuario.getIpUsuario());
+    }
+
+    public void disconnect(){
+        mWiTalkFirebaseDatabaseManager.getRef().child(ConstantsClass.Usuario.getAuthenticationId()).removeValue();
     }
 }

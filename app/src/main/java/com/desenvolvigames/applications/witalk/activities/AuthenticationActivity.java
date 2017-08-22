@@ -23,47 +23,26 @@ import com.facebook.FacebookSdk;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
-public class AuthenticationActivity extends BaseActivity //implements IAsyncNotifiable
+public class AuthenticationActivity extends BaseActivity
 {
-    private WiTalkFirebaseAuthentication mWiTalkFirebaseAuthentication;
     private Button btn_Entrar;
+//    private Button btn_Sair;
     private LoginButton mLoginButton;
     private CallbackManager mCallbackManager;
-    private AccessTokenTracker mAccessTokenTracker;
+    private WiTalkFirebaseAuthentication mWiTalkFirebaseAuthentication;
 
     @Override
     protected void onInitControls() {
         btn_Entrar = (Button) findViewById(R.id.btn_Entrar);
+//        btn_Sair = (Button) findViewById(R.id.btn_Sair);
         mLoginButton = (LoginButton)findViewById(R.id.fb_login_bn);
         mLoginButton.setReadPermissions(getString(R.string.facebook_app_permission_email), getString(R.string.facebook_app_permission_publicprofile));
         mCallbackManager = CallbackManager.Factory.create();
     }
     @Override
     protected void onInitEvents() {
-        btn_Entrar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(ConstantsClass.Usuario != null)
-                    OpenActivity.onCloseAndOpenActivity(AuthenticationActivity.this, ConnectActivity.class, null);
-                else
-                    Toast.makeText(AuthenticationActivity.this, "Usuário não encontrado!", Toast.LENGTH_SHORT).show();
-            }
-        });
+        onEnterEvent();
         onCallback();
-        mAccessTokenTracker = new AccessTokenTracker(){
-            @Override
-            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken)
-            {
-                if (currentAccessToken == null)
-                {
-                    if(mWiTalkFirebaseAuthentication.getCurrentUser() != null)
-                    {
-                        mWiTalkFirebaseAuthentication.signOut();
-                        ConstantsClass.Usuario = null;
-                    }
-                }
-            }
-        };
     }
     @Override
     protected void onSincronize() {
@@ -77,7 +56,7 @@ public class AuthenticationActivity extends BaseActivity //implements IAsyncNoti
 
         ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo mWifi = connManager.getActiveNetworkInfo();
-        if (mWifi.isConnected()) {
+        if (mWifi != null && mWifi.isConnected()) {
             onInitControls();
             onInitEvents();
             onSincronize();
@@ -85,18 +64,17 @@ public class AuthenticationActivity extends BaseActivity //implements IAsyncNoti
     }
     @Override
     protected void onStart(){
-        super.onStart();
         mWiTalkFirebaseAuthentication.onStartListener();
+        super.onStart();
     }
     @Override
     protected void onStop(){
-        super.onStop();
         mWiTalkFirebaseAuthentication.onStopListener();
+        super.onStop();
     }
-
     @Override
     protected void onDestroy(){
-        mAccessTokenTracker.stopTracking();
+        mWiTalkFirebaseAuthentication.onStopTracker();
         super.onDestroy();
     }
     @Override
@@ -116,5 +94,23 @@ public class AuthenticationActivity extends BaseActivity //implements IAsyncNoti
             @Override
             public void onError(FacebookException error){Log.d(getString(R.string.app_name), getString(R.string.facebook_app_message_error), error);}
         });
+    }
+    private void onEnterEvent(){
+        btn_Entrar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(ConstantsClass.Usuario != null)
+                    OpenActivity.onCloseAndOpenActivity(AuthenticationActivity.this, ConnectActivity.class, null);
+                else
+                    Toast.makeText(AuthenticationActivity.this, "Usuário não encontrado!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+//        btn_Sair.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                ConstantsClass.Usuario.disconnect();
+//            }
+//        });
     }
 }

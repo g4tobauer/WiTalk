@@ -24,6 +24,7 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+        <service android:name=".control.WitalkService" />
 
         <activity android:name=".activities.MainActivity">
             <intent-filter>
@@ -38,6 +39,7 @@
         <activity android:name=".activities.AuthenticationActivity" />
         <activity android:name=".activities.LobbyActivity" />
         <activity android:name=".activities.ContactActivity" />
+
     </application>
 
 </manifest>

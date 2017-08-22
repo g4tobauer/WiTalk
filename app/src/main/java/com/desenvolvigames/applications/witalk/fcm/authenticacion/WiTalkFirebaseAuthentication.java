@@ -9,6 +9,7 @@ import com.desenvolvigames.applications.witalk.activities.AuthenticationActivity
 import com.desenvolvigames.applications.witalk.entities.Usuario;
 import com.desenvolvigames.applications.witalk.utilities.constants.ConstantsClass;
 import com.facebook.AccessToken;
+import com.facebook.AccessTokenTracker;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
@@ -23,6 +24,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class WiTalkFirebaseAuthentication
 {
+    private AccessTokenTracker mAccessTokenTracker;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseAuth mAuth;
     private AuthenticationActivity mAuthenticationActivity;
@@ -50,7 +52,6 @@ public class WiTalkFirebaseAuthentication
                         mUsuario = new Usuario(user.getProviderData());
                         if(ConstantsClass.Usuario == null)
                             ConstantsClass.Usuario = mUsuario;
-//                        onBeginProgram();
                     }
                 }
                 else
@@ -59,14 +60,33 @@ public class WiTalkFirebaseAuthentication
                 }
             }
         };
+        mAccessTokenTracker = new AccessTokenTracker(){
+            @Override
+            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken)
+            {
+                if (currentAccessToken == null)
+                {
+                    if(mAuth.getCurrentUser() != null)
+                    {
+                        mAuth.signOut();
+                        if(ConstantsClass.Usuario != null) {
+                            ConstantsClass.Usuario.disconnect();
+                            ConstantsClass.Usuario = null;
+                        }
+                    }
+                }
+            }
+        };
     }
-
 
     public void onStartListener(){
         mAuth.addAuthStateListener(mAuthListener);
     }
     public void onStopListener(){
         if (mAuthListener != null){mAuth.removeAuthStateListener(mAuthListener);}
+    }
+    public void onStopTracker(){
+        mAccessTokenTracker.stopTracking();
     }
     public void onHandleFacebookAccessToken(AccessToken token){
         Log.d(mAuthenticationActivity.getString(R.string.app_name), "handleFacebookAccessToken:" + token);
@@ -84,11 +104,5 @@ public class WiTalkFirebaseAuthentication
                         }
                     }
                 });
-    }
-    public void signOut(){
-        mAuth.signOut();
-    }
-    public FirebaseUser getCurrentUser(){
-        return mAuth.getCurrentUser();
     }
 }

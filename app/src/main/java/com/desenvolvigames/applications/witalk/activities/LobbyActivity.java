@@ -34,8 +34,11 @@ import java.util.List;
 
 public class LobbyActivity extends BaseActivity implements IAsyncNotifiable{
     private ListView mUiListLobby;
-    private ContactAdapter mContactsAdapter;
-//    private ContactsListAdapter mContactsAdapter;
+    private ListView mUiListUser;
+    private LobbyAdapter mUserAdapter;
+    private List<Contact> mUserList = new ArrayList<>();
+
+    private LobbyAdapter mContactsAdapter;
     private List<Contact> mContactList = new ArrayList<>();
 
     @Override
@@ -44,32 +47,37 @@ public class LobbyActivity extends BaseActivity implements IAsyncNotifiable{
     }
     @Override
     public void ExecuteNotify(String tag, Object result) {
-        switch (tag){
-            case "Usuario":
-                result = null;
-                break;
-            case "Ip":
-                List<Contact> lst = ConstantsClass.Usuario.getLobbyList();
-                mContactList.clear();
-                if(lst != null) {
-                    Iterator<Contact> iterator = lst.iterator();
-                    while (iterator.hasNext()){
-                        Contact contact = iterator.next();
-                        if(contact.mUserId.equals(ConstantsClass.Usuario.getAuthenticationId())) {
-//                            iterator.remove();
+        if(ConstantsClass.Usuario != null) {
+            switch (tag) {
+                case "Usuario":
+                    result = null;
+                    break;
+                case "Ip":
+                    List<Contact> lstContact = ConstantsClass.Usuario.getLobbyList();
+                    mContactList.clear();
+                    mUserList.clear();
+                    if (lstContact != null) {
+                        Iterator<Contact> iterator = lstContact.iterator();
+                        while (iterator.hasNext()) {
+                            Contact contact = iterator.next();
+                            if (contact.mUserId.equals(ConstantsClass.Usuario.getAuthenticationId())) {
+                                mUserList.add(contact);
+                                iterator.remove();
+                            }
                         }
+                        mContactList.addAll(lstContact);
                     }
-                    mContactList.addAll(lst);
-                }
-                setAdapter();
-                break;
-            default:
-                break;
+                    setAdapter();
+                    break;
+                default:
+                    break;
+            }
         }
     }
     @Override
     protected void onInitControls() {
         mUiListLobby = (ListView)findViewById(R.id.mUiListLobby);
+        mUiListUser = (ListView)findViewById(R.id.mUiListUser);
         setAdapter();
     }
     @Override
@@ -81,17 +89,33 @@ public class LobbyActivity extends BaseActivity implements IAsyncNotifiable{
                 OpenActivity.onCloseAndOpenActivity(LobbyActivity.this, ContactActivity.class, null);
             }
         });
+        mUiListUser.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ConstantsClass.ContactOpened = (Contact) parent.getItemAtPosition(position);
+                OpenActivity.onCloseAndOpenActivity(LobbyActivity.this, ContactActivity.class, null);
+            }
+        });
     }
     @Override
     protected void onSincronize() {
-        ConstantsClass.Usuario.Sincronize(LobbyActivity.this);
-        ConstantsClass.Usuario.connect();
+        ConstantsClass.Usuario.connect(LobbyActivity.this);
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lobby);
+        verifyNotification();
+        onInitControls();
+        onInitEvents();
+        onSincronize();
+    }
+    @Override
+    public void onBackPressed() {
+        OpenActivity.onCloseAndOpenActivity(LobbyActivity.this, AuthenticationActivity.class, null);
+    }
 
+    private void verifyNotification(){
         Bundle extras = getIntent().getExtras();
         if(extras != null) {
             if (extras.containsKey(getString(R.string.intent_notification))) {
@@ -104,22 +128,19 @@ public class LobbyActivity extends BaseActivity implements IAsyncNotifiable{
                 }
             }
         }
-        onInitControls();
-        onInitEvents();
-        onSincronize();
-    }
-    @Override
-    public void onBackPressed() {
-        OpenActivity.onCloseAndOpenActivity(LobbyActivity.this, AuthenticationActivity.class, null);
     }
 
     private void setAdapter(){
         if(mContactsAdapter==null) {
-            mContactsAdapter = new ContactAdapter(LobbyActivity.this, mContactList);
-//            mContactsAdapter = new ContactsListAdapter(LobbyActivity.this);
+            mContactsAdapter = new LobbyAdapter(LobbyActivity.this, mContactList);
             mUiListLobby.setAdapter(mContactsAdapter);
         }
+        if(mUserAdapter == null){
+            mUserAdapter = new LobbyAdapter(LobbyActivity.this, mUserList);
+            mUiListUser.setAdapter(mUserAdapter);
+        }
         mContactsAdapter.notifyDataSetChanged();
+        mUserAdapter.notifyDataSetChanged();
     }
 
     private class ContatoHolder {
@@ -128,9 +149,9 @@ public class LobbyActivity extends BaseActivity implements IAsyncNotifiable{
         public ImageView userImageResource;
     }
 
-    private class ContactAdapter extends ArrayAdapter<Contact> {
+    private class LobbyAdapter extends ArrayAdapter<Contact> {
 
-        public ContactAdapter(@NonNull Context context, List<Contact> contatos) {
+        public LobbyAdapter(@NonNull Context context, List<Contact> contatos) {
             super(context, 0, contatos);
         }
 
@@ -155,20 +176,20 @@ public class LobbyActivity extends BaseActivity implements IAsyncNotifiable{
 
             Contact p = getItem(position);
             holder.userNick.setText(p.mNome);
-            holder.userStatus.setText(p.mUserMessageToken);
+            holder.userStatus.setText(p.mStatus);
 //            Picasso.with(getContext()).load(p.ImagemContato).into(holder.imgContato);
 //            Picasso.with(getContext()).load("http://i.imgur.com/DvpvklR.png").into(holder.imgContato);
 
-            AsyncContactAdapter asyncContatoAdapter = new AsyncContactAdapter(holder.userImageResource);
+            AsyncLobbyAdapter asyncContatoAdapter = new AsyncLobbyAdapter(holder.userImageResource);
             asyncContatoAdapter.execute(p.mUserImageResource);
 
             return v;
         }
     }
 
-    private class AsyncContactAdapter extends AsyncTask<String, Void, Bitmap> {
+    private class AsyncLobbyAdapter extends AsyncTask<String, Void, Bitmap> {
         private ImageView loadedImage;
-        public AsyncContactAdapter(ImageView imageView){
+        public AsyncLobbyAdapter(ImageView imageView){
             loadedImage = imageView;
         }
         @Override

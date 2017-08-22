@@ -22,6 +22,19 @@
             app:popupTheme="@style/AppTheme.PopupOverlay" />
     </android.support.design.widget.AppBarLayout>
     <ListView
+        android:layout_weight="0"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/mUiListUser" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_weight="0"
+        android:visibility="visible" />
+
+    <ListView
+        android:layout_weight="1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/mUiListLobby" />
