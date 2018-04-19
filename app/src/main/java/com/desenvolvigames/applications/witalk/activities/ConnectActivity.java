@@ -45,7 +45,7 @@ public class ConnectActivity extends BaseActivity implements IAsyncNotifiable{
     }
     @Override
     protected void onSincronize() {
-        ConstantsClass.Usuario.Sincronize(ConnectActivity.this);
+        ConstantsClass.Usuario.SincronizeNotifiable(ConnectActivity.this);
     }
 
     @Override

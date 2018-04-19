@@ -53,10 +53,9 @@ public class ContactActivity extends BaseActivity {
                     }
                 }
             }
-
 //            Bundle bundle = intent.getExtras();
 //            String message = bundle.getString(getString(R.string.intent_message));
-            addMessage(messageBody.data.UserMessage);
+            addMessage(messageBody.data.UserMessage, messageBody.data.UserId);
         }
     };
     @Override
@@ -117,7 +116,7 @@ public class ContactActivity extends BaseActivity {
                         MessageSender.SenderResult senderResult = messageSender.sendMessage();
                         if(senderResult != null){
                             if(senderResult.success !=0){
-                                addMessage(message);
+                                addMessage(message, messageSender.getMessageBody().data.UserId);
                             }
                         }
                     }catch (Exception ex){
@@ -137,8 +136,18 @@ public class ContactActivity extends BaseActivity {
         OpenActivity.onCloseAndOpenActivity(ContactActivity.this, LobbyActivity.class, null);
     }
 
-    private void addMessage(String message){
-        mContactAdapter.addMessage(message);
+    private String mLastId;
+
+    private void addMessage(String message, String id){
+
+        if(mLastId == null || !mLastId.equals(id)){
+            mLastId = id;
+            mContactAdapter.addMessage(message);
+        }
+        else{
+            mContactAdapter.appendMessage(message);
+        }
+
         setAdapter();
     }
 
@@ -181,6 +190,15 @@ public class ContactActivity extends BaseActivity {
 
         public void addMessage(String message) {
             mlstMessage.add(message);
+        }
+
+        public void appendMessage(String message) {
+            int lastIndex = mlstMessage.size()-1;
+            StringBuilder sb = new StringBuilder();
+            sb.append(mlstMessage.get(lastIndex))
+            .append("\n")
+            .append(message);
+            mlstMessage.set(lastIndex, sb.toString());
         }
     }
 }

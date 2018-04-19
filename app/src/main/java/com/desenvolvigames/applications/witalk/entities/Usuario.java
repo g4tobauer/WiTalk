@@ -3,7 +3,11 @@ package com.desenvolvigames.applications.witalk.entities;
 import com.desenvolvigames.applications.witalk.fcm.database.WiTalkFirebaseDatabaseManager;
 import com.desenvolvigames.applications.witalk.interfaces.IAsyncNotifiable;
 import com.google.firebase.auth.UserInfo;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.List;
@@ -43,21 +47,28 @@ public class Usuario extends EntityBase{
                 mFacebookUser = user;
             }
         }
-        if(mWiTalkFirebaseDatabaseManager == null)
-            mWiTalkFirebaseDatabaseManager = new WiTalkFirebaseDatabaseManager(this);
         Init();
     }
 
     @Override
     protected void Init(){
-        DatabaseReference ref = mWiTalkFirebaseDatabaseManager.getRef();
-        ref.child(FirebaseUid).setValue(mFirebaseUser.getUid());
-        ref.child(FacebookUid).setValue(mFacebookUser.getUid());
-        ref.child(Nome).setValue(mFirebaseUser.getDisplayName());
-        ref.child(Status).setValue("Olá !");
-        ref.child(Email).setValue(mFirebaseUser.getEmail());
-        ref.child(UserImageSource).setValue(mFirebaseUser.getPhotoUrl().toString());
-        ref.child(UserMessageToken).setValue(getFirebaseInstanceMessageToken());
+        super.Init();
+        Query query = mWiTalkFirebaseDatabaseManager.getRef().orderByKey();
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.exists())
+                    Usuario.this.initDefault();
+//                else
+//                    for (DataSnapshot issue : dataSnapshot.getChildren()) {
+//                            mWiTalkFirebaseDatabaseManager.getRef().child(issue.getKey()).setValue(issue.getValue());
+//                    }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
@@ -66,16 +77,16 @@ public class Usuario extends EntityBase{
     }
 
     @Override
-    public void Sincronize(IAsyncNotifiable asyncNotifiable){
+    public void SincronizeNotifiable(IAsyncNotifiable asyncNotifiable){
         SyncTime(mWiTalkFirebaseDatabaseManager.getRef());
-        mAsyncNotifiable = asyncNotifiable;
-        if(mIp!=null){mIp.Sincronize(mAsyncNotifiable);}
+        mSyncNotifiable = asyncNotifiable;
+        if(mIp!=null){mIp.SincronizeNotifiable(mSyncNotifiable);}
     }
 
     @Override
     protected void UpdateSnapshot(){
-        if(mAsyncNotifiable!=null)
-            mAsyncNotifiable.ExecuteNotify(Usuario.this.getClass().getSimpleName(), Usuario.this);
+        if(mSyncNotifiable!=null)
+            mSyncNotifiable.ExecuteNotify(Usuario.this.getClass().getSimpleName(), Usuario.this);
     }
 
     public void connect(IAsyncNotifiable asyncNotifiable){
@@ -85,7 +96,7 @@ public class Usuario extends EntityBase{
         }else{
             mIp.Init();
         }
-        Sincronize(asyncNotifiable);
+        SincronizeNotifiable(asyncNotifiable);
         mIsConnected = true;
     }
 
@@ -96,12 +107,26 @@ public class Usuario extends EntityBase{
         }
     }
 
-    public boolean isConnected(){
-        return mIsConnected;
-    }
-
     public void setIpUsuario(String ipUsuario){
         mWiTalkFirebaseDatabaseManager.getRef().child(IpUsuario).setValue(ipUsuario);
+    }
+
+    public void setNomeUsuario(String nomeUsuario){
+        DatabaseReference ref = mWiTalkFirebaseDatabaseManager.getRef();
+        ref.child(Nome).setValue(nomeUsuario);
+        if(mIp != null)
+            mIp.setNomeUsuario(nomeUsuario);
+    }
+
+    public void setStatusUsuario(String statusUsuario){
+        DatabaseReference ref = mWiTalkFirebaseDatabaseManager.getRef();
+        ref.child(Status).setValue(statusUsuario);
+        if(mIp != null)
+            mIp.setStatusUsuario(statusUsuario);
+    }
+
+    public boolean isConnected(){
+        return mIsConnected;
     }
 
     public List<Contact> getLobbyList(){
@@ -113,7 +138,11 @@ public class Usuario extends EntityBase{
     }
 
     public String getNomeUsuario(){
-        return mFirebaseUser.getDisplayName();
+        String nome = mDataSnapshot.child(Nome).getValue(String.class);
+        nome = nome == null?"":nome;
+        if(nome.isEmpty())
+            nome = mFirebaseUser.getDisplayName();
+        return nome;
     }
 
     public String getUserMessageToken(){
@@ -134,5 +163,16 @@ public class Usuario extends EntityBase{
 
     private String getFirebaseInstanceMessageToken(){
         return FirebaseInstanceId.getInstance().getToken();
+    }
+
+    private void initDefault(){
+        DatabaseReference ref = mWiTalkFirebaseDatabaseManager.getRef();
+        ref.child(FirebaseUid).setValue(mFirebaseUser.getUid());
+        ref.child(FacebookUid).setValue(mFacebookUser.getUid());
+        ref.child(Nome).setValue(mFirebaseUser.getDisplayName());
+        ref.child(Status).setValue("Olá !");
+        ref.child(Email).setValue(mFirebaseUser.getEmail());
+        ref.child(UserImageSource).setValue(mFirebaseUser.getPhotoUrl().toString());
+        ref.child(UserMessageToken).setValue(getFirebaseInstanceMessageToken());
     }
 }

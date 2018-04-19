@@ -28,7 +28,6 @@ public class WiTalkFirebaseAuthentication
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseAuth mAuth;
     private AuthenticationActivity mAuthenticationActivity;
-    private Usuario mUsuario;
 
     public WiTalkFirebaseAuthentication(AuthenticationActivity authenticationActivity){
         mAuthenticationActivity = authenticationActivity;
@@ -47,16 +46,8 @@ public class WiTalkFirebaseAuthentication
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null)
                 {
-                    if(mUsuario == null)
-                    {
-                        mUsuario = new Usuario(user.getProviderData());
-                        if(ConstantsClass.Usuario == null)
-                            ConstantsClass.Usuario = mUsuario;
-                    }
-                }
-                else
-                {
-                    mUsuario = null;
+                    if(ConstantsClass.Usuario == null)
+                        ConstantsClass.Usuario = new Usuario(user.getProviderData());
                 }
             }
         };

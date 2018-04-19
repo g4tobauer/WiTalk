@@ -71,14 +71,15 @@
 <!--</LinearLayout>-->
 
 <LinearLayout
-xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:tools="http://schemas.android.com/tools"
-tools:ignore="ContentDescription"
-android:orientation="vertical"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:padding="2dp"
-tools:context="com.desenvolvigames.applications.witalk.activities.ContactActivity">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    tools:ignore="ContentDescription"
+    android:orientation="vertical"
+    android:padding="2dp"
+    tools:context="com.desenvolvigames.applications.witalk.activities.ContactActivity">
+    <include layout="@layout/layout_base"/>
     <ListView
         android:id="@+id/lstViewContactMessage"
         android:layout_width="wrap_content"

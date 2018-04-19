@@ -16,7 +16,7 @@ public abstract class EntityBase implements IDataBaseManageable{
 
     protected final String NODE = "NODE";
     protected DataSnapshot mDataSnapshot;
-    protected IAsyncNotifiable mAsyncNotifiable;
+    protected IAsyncNotifiable mSyncNotifiable;
     protected WiTalkFirebaseDatabaseManager mWiTalkFirebaseDatabaseManager;
 
     @Override
@@ -24,14 +24,19 @@ public abstract class EntityBase implements IDataBaseManageable{
         mDataSnapshot = dataSnapshot;
         UpdateSnapshot();
     }
+
     protected void SyncTime(DatabaseReference ref){
 //        if(ref == null)
 //            mWiTalkFirebaseDatabaseManager.getRef().child(SyncTime).setValue(mWiTalkFirebaseDatabaseManager.getTime());
 //        else
             ref.child(SyncTime).setValue(mWiTalkFirebaseDatabaseManager.getTime());
     }
+    protected void Init()
+    {
+        if(mWiTalkFirebaseDatabaseManager == null)
+            mWiTalkFirebaseDatabaseManager = new WiTalkFirebaseDatabaseManager(this);
+    }
 
-    public abstract void Sincronize(IAsyncNotifiable asyncNotifiable);
-    protected abstract void Init();
+    public abstract void SincronizeNotifiable(IAsyncNotifiable asyncNotifiable);
     protected abstract void UpdateSnapshot();
 }

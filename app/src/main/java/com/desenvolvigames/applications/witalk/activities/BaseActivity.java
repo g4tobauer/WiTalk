@@ -1,6 +1,7 @@
 package com.desenvolvigames.applications.witalk.activities;
 
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 
 /**
